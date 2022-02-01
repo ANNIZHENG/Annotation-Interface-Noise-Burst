@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Annotation Interface</title>
+	<link rel="stylesheet" type="text/css" href="/templates/interface/assets/css/interface.css">
+	<style>
+	td{
+		background-color: #eeeeee;
+		padding: 3px;
+	}
+	</style>
+</head>
+<body id = "body" onload="ajax_start()">
+	<div class="container-3D"> 
+		<div id="3d-head" width="400"></div>
+	</div>
+	<div class="container" id = "container">
+		<div>
+			<button id="message">Instructions</button>
+			<button id="key-message">Keyboard Rules</button>
+			<h2>Please listen to the audio</h2>
+			<audio id="audio" controls style="display: none;"><source id = "source" type="audio/wav"> Your browser does not support audio </audio>
+			<button id="audio-frame">Play Audio</button><br>
+			<div id="question" for="count" style="font-size: 15px; font-weight: bold;">Where is the location of the source?</div><br>
+			<label id="2d-question" for="2d" style="font-size: 15px; font-weight: bold;"></label><br>
+			<div id="2d" style="margin-top: 5px;">
+				<div id="head-wrapper" style="display: none;"><div style="font-weight:bold; font-size:13px; color:blue; text-align: center;">Head View</div>
+					<div id="head" style="background-image: url('/templates/interface/img/head.png');">
+						<div class="circular" id="circular"></div>
+						<div class="circular" id="circular1" style="display: none;"><div class="indicator" id="head-item-1" style="display: none;">1</div></div>
+					</div>
+				</div>
+				<div id="feedback" style="display: none;">
+					<div id='azimuth-dot'></div>azimuth: <button id='azimuth-minus'>-</button><div id='p-azimuth'"></div><button id='azimuth-plus'>+</button><br><br>
+					<div id='elevation-dot'></div>elevation: <button id='elevation-minus'>-</button><div id='p-elevation'"></div><button id='elevation-plus'>+</button>
+					<div style="margin-top:10px; font-size: 11px; color:blue; text-align:center; font-weight:bold;">You May Take Notes Here</div>
+					<textarea id="user_note" style="font-size: 11px; width: 100%; height: 90px; background-color:#f0f8ff; z-index:2;"></textarea>
+				</div>
+				<br>
+				<div id="front-wrapper" style="display: none;"><div style="font-weight:bold; font-size:13px; color:blue; text-align: center;">Back View</div>
+					<div id="front" style="background-image: url('/templates/interface/img/front.png');">
+						<div class="circular" id="circularF"></div>
+						<div class="circular" id="circularF1" style="display: none;"><div class="indicator" id="front-item-1" style="display: none;">1</div></div>
+					</div>
+				</div>
+				<div id="side-wrapper" style="display: none;"><div style="font-weight:bold; font-size:13px; color:blue; text-align: center; z-index:1;">Side View</div>
+					<div id="side" style="background-image: url('/templates/interface/img/side.png');">
+						<div class="circular" id="circularS"></div>
+						<div class="circular" id="circularS1" style="display: none;"><div class="indicator" id="side-item-1" style="display: none;">1</div></div>
+					</div>
+				</div>
+			</div>
+
+			<input id="btn-button-refresh" type="button" name="btn-button-refresh" value="REFRESH" onclick="reloadAll()" style="display: none;">
+			<input id="btn-button-submit" type="submit" name="btn-button-submit" value="SUBMIT" onclick="ajax_next()" style="display: none;">
+			<input id="btn-button-next" type="submit" name="btn-button-next" value="NEXT" onclick="ajax_next()" style="display: none;">
+
+			<div id="modal">
+				<div class="instructions">
+					<button class="move" id="instruction-left" style="margin-right: 20px;">&#8249;</button>
+					
+					<div id="instruction1">
+						<p style="font-size: 17px;">Page 1 / 7</p>
+						<h3 style="text-align: center; color: blue; margin-top: 3vh;">Annotation Interface Instructions</h3>
+						<img src="/templates/interface/img/1.png" style="width:70%; display: block; margin: auto;">
+						<p>You will be asked to localize the sound source.</p>
+						<p>1. To play the audio click "Play Audio".</p>
+						<p>2. If you want to pause the audio click "Pause Audio".</p>
+						<p>You may listen to the audio as many times as you want.</p>
+					</div>
+					<div id="instruction2" style="display: none; margin-right: auto;">
+						<p style="font-size: 17px;">Page 2 / 7</p>
+						<h3 style="text-align: center; color: blue;">Annotation Interface Instructions</h3>
+						<p style="text-align: center; margin-top: 3vh;">Below are the classes of the sound source you are going to be exposed in the audio</p>
+						<table style="margin-left: auto; margin-right: auto;">
+							<tr>
+								<th style="border: 1px solid black;">Coarse Class</th>
+								<th style="border: 1px solid black;">Specific Class</th>
+							</tr>
+							<tr><td>Large Transportation Methods</td><td>Airplane</td></tr>
+							<tr><td>Domestic Sounds</td><td>Boiling Liquids</td></tr>
+							<tr><td>Alarms</td><td>Car Alarm</td></tr>
+							<tr><td>Animals</td><td>Cat Meowing</td></tr>
+							<tr><td>Music</td><td>Cello</td></tr>
+							<tr><td>Saw Type Sounds</td><td>Chainsaw</td></tr>
+							<tr><td>Impact Sounds</td><td>Clarinet</td></tr>
+							<tr><td>Human Voice</td><td>Dog Barking</td></tr>
+							<tr><td>Engines</td><td>Dryer</td></tr>
+							<tr><td>Natural Sounds</td><td>Electric Saw-Type</td></tr>
+						</table>
+						<br>
+						<audio id="audio-instruction"><source id = "source" type="audio/wav" src="/templates/interface/assets/audio/recording/0.wav">Your browser does not support audio</audio>
+						<button id="audio-frame-instruction" style="display: block; margin-left: auto; margin-right: auto;">Click to Play Sample Audio</button>
+					</div>
+					<div id="instruction3" style="display: none;">
+						<p style="font-size: 17px;">Page 3 / 6</p>
+						<h3 style="text-align: center; color: blue;"> Annotation Interface Instructions</h3>
+						<img src="/templates/interface/img/2.png"  style="width:70%; display: block; margin: auto;">
+						<p>Once you've finished listening to the audio, you will see a 2D representation of the space, with 3 views.</p>
+					</div>
+					<div id="instruction4" style="display: none;">
+						<p style="font-size: 17px;">Page 4 / 6</p>
+						<h3 style="text-align: center; color: blue;"> Annotation Interface Instructions</h3>
+						<img src="/templates/interface/img/3.png" style="width:70%; display: block; margin: auto;">
+						<p>Please localize the source identified in those views.</p>
+						<p>The "top view" allows you to annotate azimuth or horizontal location.</p>
+						<p>The "back view" and "side view" allow you to annotate the elvation of the source.</p>
+						<p>You will see your annotation updated in real time in the 3D view to the left of your screen. You can rotate this view and zoom in or out but not annotate in it.</p>
+					</div>
+					<div id="instruction5" style="display: none;">
+						<p style="font-size: 17px;">Page 5 / 6</p>
+						<h3 style="text-align: center; color: blue;"> Annotation Interface Instructions</h3>
+						<img src="/templates/interface/img/4.png" style="width:70%; display: block; margin: auto;">
+						<p>To add a new view source press "Option" or "Alt" + click.</p>
+						<p>To remove a source press "Command" or "Win" + click.</p>
+						<p>You can always see the roles in the "Keyboard Rules" button.</p>
+						<p>To create a successful annotation, you must place the source in the "top view" and at least one of the "back" or "side" view.</p>
+					</div>
+					<div id="instruction6" style="display: none;">
+						<p style="font-size: 17px;">Page 6 / 6</p>
+						<h3 style="text-align: center; color: blue;"> Annotation Interface Instructions</h3>
+						<img src="/templates/interface/img/5.png" style="width:70%; display: block; margin: auto;">
+						<p>If you need to adjust the location of the sources, you may click on the desired point and move it, or use the [+] and [-] buttons.</p>
+						<p>Click submit once you have completed your annotation.</p>
+					</div>
+					<span id="sign" style="display: none;">&times;</span>
+					<button class="move" id="instruction-proceed" style="margin-left: 20px; font-size: 30px; padding:11px; display: none;">
+						C<br>L<br>I<br>C<br>K<br><br>T<br>O<br><br>S<br>T<br>A<br>R<br>T
+					</button>
+					<button class="move" id="instruction-right" style="margin-left: 20px;">&#8250;</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="//cdn.rawgit.com/mrdoob/three.js/master/build/three.js"></script>
+	<script src="//cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
+	<script src="/templates/interface/assets/js/interface.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!--
+BSD 2-Clause License
+
+Copyright (c) 2017, The HeadphoneCheck Authors (see AUTHORS)
+All rights reserved.
+
+Contact Ray Gonzalez raygon@mit.edu or Kevin J. P. Woods kwoods@mit.edu
+=======================================================================
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Import jQuery from Google CDN -->
+    <title>Headphone Check</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/templates/HeadphoneCheck.js"></script> 
+    <style type="text/css">
+      *, *::before, *::after {
+        box-sizing: border-box;
+        font-family: Monaco;
+      }
+
+      body {
+        margin: auto;
+        margin-top: 7vh;
+        max-width: 70%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      input[type=radio] {
+        margin-right: 4px;
+        height:17px;
+        width:17px;
+      }
+
+      label{
+        display: block;
+      }
+
+      div{
+        margin-bottom: 10px;
+      }
+    
+    </style>
+  </head>
+
+  <body onload="HeadphoneCheck.runHeadphoneCheck();">
+    <div id="hc-container"></div>
+    <script>
+      $(document).on('hcHeadphoneCheckEnd', function(event, data) {
+        var results = data.data;
+        var config = data.config;
+        var didPass = data.didPass;
+        if (didPass) start();
+        else {
+          $('<div/>', {
+            html: 'Screening task failed.<br/><br/>Total Correct: ' + results.totalCorrect + '<br/>Please re-do the head phone check tasks'
+          }).appendTo($('body'));
+        }
+      });
+
+      function start(){
+        window.location = '/templates/interface/interface.html';
+        // var req = new XMLHttpRequest();
+        // req.open('POST', '/annotation_interface');
+        // req.onreadystatechange = function() {
+        //   if (req.readyState == 4 && req.response != 'success') window.alert('Something went wrong');
+        //   if ((req.status == 200 || req.status == 304) && req.responseText == 'success') window.location = '/templates/interface/interface.html';
+        // }
+        // req.send();
+      }
+    </script>
+  </body>
+</html>
