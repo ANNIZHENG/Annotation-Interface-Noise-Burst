@@ -1,13 +1,13 @@
 CREATE TABLE "Recording" (
-	id serial PRIMARY KEY,
-	recording_name VARCHAR,
 	file_name VARCHAR,
-	num_annotation INTEGER,
-	group_id INTEGER
+	recording_id INTEGER PRIMARY KEY,
+	group_id INTEGER,
+	user_num_annotation INTEGER,
+	group_num_annotation INTEGER
 );
 
 
-COPY "Recording"(recording_name, file_name, num_annotation, group_id)
-FROM '/Users/anniezheng/Desktop/Annotation-Interface-Noise-Burst/database/recording.csv'
+COPY "Recording"(file_name, recording_id, group_id, user_num_annotation, group_num_annotation)
+FROM '/Users/anniezheng/Desktop/Annotation-Interface-Noise-Burst/database/gaussian_groups.csv'
 DELIMITER ','
 CSV HEADER;

@@ -10,10 +10,10 @@ app = Flask(__name__,static_folder="../templates",template_folder="..")
 
 @app.route('/')
 def home():
-    result = eng.execute('''select num_annotation from "Recording" order by num_annotation asc limit 1''')
+    result = eng.execute('''select group_num_annotation from "Recording" order by group_num_annotation asc limit 1''')
     least_annotation = ''
     for r in result:
-        least_annotation = int(dict(r)['num_annotation'])
+        least_annotation = int(dict(r)['group_num_annotation'])
     if (least_annotation == 8):
         return render_template('/templates/interface/finish.html')
     else:
@@ -26,21 +26,16 @@ def start():
     entry = Survey(survey_id)
     ses.add(entry)
     ses.commit()
-
     while (True):
-        recording = randrange(8) # get random digit from 0 to 7
-        result = eng.execute('''select file_name, group_id, num_annotation from "Recording" where group_id='''+str(recording))
+        recording = randrange(8)+1 # get random digit from 0 to 7
+        result = eng.execute('''select file_name, group_id from "Recording" where group_id='''+str(recording))
         recordings = '''"recordings":{'''
         index = 0
         group_id = ''
         for r in result:
-            if (int(dict(r)['num_annotation']) < 8):
-                recordings = recordings + '"' + str(index) + '":' + '"' + str(dict(r)['file_name']) + '",'
-                group_id = str(dict(r)['group_id'])
-                index += 1
-            else:
-                continue
-        
+            recordings = recordings + '"' + str(index) + '":' + '"' + str(dict(r)['file_name']) + '",'
+            group_id = str(dict(r)['group_id'])
+            index += 1
         recordings = recordings[:len(recordings)-1] + "}"
         group_id = '''"group_id":{"0":"''' + group_id + '"}'
         survey_id = '''"survey_id":{"0":"''' + str(survey_id) + '"}'
@@ -69,12 +64,12 @@ def next():
         file_name = data['file_name']
         user_note = data['user_note']
 
-        result_recording_id = eng.execute('''select id from "Recording" where file_name = '''+ "'" + file_name + "'")
+        result_recording_id = eng.execute('''select recording_id from "Recording" where file_name = '''+ "'" + file_name + "'")
         for r in result_recording_id:
-            recording_id = dict(r)['id']
+            recording_id = dict(r)['recording_id']
 
         # update number of annotation in Recording table
-        eng.execute('''update "Recording" set num_annotation= num_annotation + 1 where id='''+ str(recording_id))
+        eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 1 where recording_id = '''+ str(recording_id))
 
         # insert into Interaction table
         timestamp= datetime.fromtimestamp(data['timestamp'] / 1000)

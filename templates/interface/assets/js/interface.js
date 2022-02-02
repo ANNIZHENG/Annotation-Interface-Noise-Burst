@@ -2,9 +2,9 @@
 var request = new XMLHttpRequest();
 var survey_id = '';
 var group_id = [];
-var recordings = []; // an array of recordings assigned to users
-var curr_recording = 0; // current recording number --> index
-var totalAudios = 6; // total number of audios user has to annotate
+var recordings = [];
+var curr_recording = 0;
+var totalAudios = 0;
 
 ajax_start();
 
@@ -19,12 +19,28 @@ function ajax_start(){
 
 			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings"] )) {
 				recordings.push(value);
+				recordings.push(value);
+				recordings.push(value);
+				recordings.push(value);
 			}
-			document.getElementById('source').src = '/templates/interface/assets/audio/'+group_id.toString()+'/'+recordings[curr_recording];
+			recordings = shuffle(recordings);
+			totalAudios = recordings.length - 1;
+			document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
 			document.getElementById('audio').load();
 		}
 	}
 	request_start.send();
+}
+
+/* Fisher-Yates Shuffle */
+function shuffle(array) {
+	let currentIndex = array.length, randomIndex;
+	while (currentIndex != 0) {
+	  randomIndex = Math.floor(Math.random() * currentIndex);
+	  currentIndex--;
+	  [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+	}
+	return array;
 }
 
 // check if the user goes through the whole instruction
@@ -83,37 +99,6 @@ document.getElementById('elevation-plus').addEventListener("click",move_elevatio
 document.getElementById('azimuth-minus').addEventListener("click",move_azimuth_minus);
 document.getElementById('elevation-minus').addEventListener("click",move_elevation_minus);
 
-document.addEventListener('click', function(e){
-	if (e.target.id.substring(0,23) == "audio-frame-instruction") {
-		isPlaying = false;
-		document.getElementById('audio').pause();
-		document.getElementById('audio-frame').innerHTML='Play Audio';
-		var audios = document.getElementsByClassName('audio-frame-instruction');
-		playing_id = ''
-		for(let i = 0; i < audios.length; i++) {
-			audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
-			if (audios[i].id != e.target.id) {
-				document.getElementById(audio_id).pause();
-				document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
-			}
-			else {
-				playing_id = audio_id;
-				document.getElementById(audios[i].id).innerHTML = document.getElementById(audios[i].id).innerHTML == 'Click to Play Sample Audio' ? 'Click to Pause Sample Audio' : 'Click to Play Sample Audio';
-				document.getElementById(audios[i].id).innerHTML == 'Click to Play Sample Audio' ? document.getElementById(audio_id).pause() : document.getElementById(audio_id).play();
-			}
-		}
-		document.getElementById(playing_id).addEventListener("timeupdate",function(){
-			if (playing_id.replace('audio-','') == e.target.id.replace('audio-frame-instruction-','')) {
-				let track = document.getElementById(playing_id).currentTime / document.getElementById(playing_id).duration * 100;
-				document.getElementById(e.target.id).style.background = 'linear-gradient(to right, #efefef '+ track +'%, #ffffff 0%)';
-			}
-		});
-		document.getElementById(playing_id).addEventListener("ended",function(){
-			document.getElementById(e.target.id).innerHTML = 'Click to Play Sample Audio';
-		});
-	}
-});
-
 function popKeyRules(e){
 	e.preventDefault();
 	window.alert("Press [Option] or [Alt] key to add an annotation once you see the cursor turning to '+'\n\nPress [Command] or [Win] key to delete an annotation once you see the cursor turning to '-'\n\nDeleting an annotation means to delete both its annotated azimuth and elevation(s)")
@@ -134,31 +119,17 @@ function popRules(e){
 
 function closeRules(e){ 
 	e.preventDefault();
-	let audios = document.getElementsByClassName('audio-frame-instruction');
-	for (let i = 0; i < audios.length; i++) {
-		audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
-		document.getElementById(audio_id).pause();
-		document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
-	}
 	modal.style.display = "none";
 }
 
 function move_instruction_next(e){
 	e.preventDefault();
-	if (curr_instruction == 2){ // pause all audios
-		let audios = document.getElementsByClassName('audio-frame-instruction');
-		for (let i = 0; i < audios.length; i++) {
-			audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
-			document.getElementById(audio_id).pause();
-			document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
-		}
-	}
-	if (curr_instruction < 7) {
+	if (curr_instruction < 4) {
 		document.getElementById('instruction'+curr_instruction).style.display = 'none';
 		document.getElementById('instruction'+(curr_instruction+1)).style.display = '';
 		curr_instruction += 1;
 	}
-	if (curr_instruction == 7) {
+	if (curr_instruction == 4) {
 		document.getElementById("instruction-right").style.display = 'none';
 		document.getElementById("instruction-proceed").style.display = '';
 		read_all_rules = true;
@@ -168,14 +139,6 @@ function move_instruction_next(e){
 function move_instruction_last(e){
 	e.preventDefault();
 	if (curr_instruction > 1) {
-		if (curr_instruction == 2){ // pause all audios
-			let audios = document.getElementsByClassName('audio-frame-instruction');
-			for (let i = 0; i < audios.length; i++) {
-				audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
-				document.getElementById(audio_id).pause();
-				document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
-			}
-		}
 		document.getElementById("instruction-right").style.display = '';
 		document.getElementById("instruction-proceed").style.display = 'none';
 		document.getElementById('instruction'+curr_instruction).style.display = 'none';
@@ -222,7 +185,6 @@ function display2D(){
 }
 
 function displayButton(){
-	console.log(curr_recording);
 	if (curr_recording < totalAudios) document.getElementById('btn-button-next').setAttribute('style','float:right;');
 	else document.getElementById('btn-button-submit').setAttribute('style','float:right;');
 }
@@ -273,7 +235,7 @@ function ajax_next(){
         document.getElementById('dot-tracker').style.display = 'none';
         document.getElementById('btn-button-next').style.display = 'none';
         document.getElementById('audio-frame').style.background = 'linear-gradient(to right, #efefef 0%, #ffffff 0%)';
-        document.getElementById('source').src = '/templates/interface/assets/audio/'+group_id.toString()+'/'+recordings[curr_recording];
+        document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
         document.getElementById('audio').load();
     }
 }
@@ -905,7 +867,7 @@ function keyboardEvents(e){
 
 			if (enable_head){
 				if ( azimuth_item_index == 1 ){
-					window.alert("You have already enter 1 azimuth elements"); 
+					window.alert("You have already enter 1 azimuth element"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
 					enable_head = false;
@@ -1083,7 +1045,7 @@ function keyboardEvents(e){
 			}
 			else if (enable_front){
 				if ( elevation_item_index == 1 ){
-					window.alert("You have already enter 1 elevation elements"); 
+					window.alert("You have already enter 1 elevation element"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
 					enable_front = false;
@@ -1218,7 +1180,7 @@ function keyboardEvents(e){
 			}
 			else if (enable_side){
 				if (elevation_item_index == 1){
-					window.alert("You have already enter 1 elevation elements"); 
+					window.alert("You have already enter 1 elevation element"); 
 					document.getElementById('body').style.cursor = 'default';
 					key_perform = false;
 					enable_side = false;
