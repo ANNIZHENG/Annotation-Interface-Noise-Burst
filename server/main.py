@@ -1,3 +1,4 @@
+from tokenize import group
 import uuid
 from sqlalchemy import *
 from sqlalchemy.sql import *
@@ -27,19 +28,32 @@ def start():
     ses.add(entry)
     ses.commit()
     while (True):
-        recording = randrange(8)+1 # get random digit from 0 to 7
-        result = eng.execute('''select file_name, group_id from "Recording" where group_id='''+str(recording))
-        recordings = '''"recordings":{'''
-        index = 0
-        group_id = ''
+        recording = randrange(8) + 1 # get random digit from 1 to 8, which is group id
+        result = eng.execute('''select file_name, group_num_annotation from "Recording" where group_id='''+str(recording))
+        found = False
         for r in result:
-            recordings = recordings + '"' + str(index) + '":' + '"' + str(dict(r)['file_name']) + '",'
-            group_id = str(dict(r)['group_id'])
-            index += 1
-        recordings = recordings[:len(recordings)-1] + "}"
-        group_id = '''"group_id":{"0":"''' + group_id + '"}'
-        survey_id = '''"survey_id":{"0":"''' + str(survey_id) + '"}'
-        return "{" + survey_id + "," + group_id + "," + recordings + "}"
+            group_num_annotation = int(dict(r)['group_num_annotation'])
+            if (group_num_annotation == 8):
+                break
+            else:
+                eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id='''+str(recording))
+                found = True
+                break
+        if (found):
+            break
+        else:
+            continue
+
+    recordings = '''"recordings":{'''
+    index = 0
+    group_id = ''
+    for r in result:
+        recordings = recordings + '"' + str(index) + '":' + '"' + str(dict(r)['file_name']) + '",'
+        index += 1
+    recordings = recordings[:len(recordings)-1] + "}"
+    group_id = '''"group_id":{"0":"''' + recording + '"}'
+    survey_id = '''"survey_id":{"0":"''' + str(survey_id) + '"}'
+    return "{" + survey_id + "," + group_id + "," + recordings + "}"
 
 
 @app.route('/interaction', methods=['GET', 'POST'])
