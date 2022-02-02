@@ -211,7 +211,6 @@ function addPlaying(e){
 function display2D(){ 
 	isPlaying = false;
 	document.getElementById('audio-frame').innerHTML='Play Audio';
-	reloadAll();
 	document.getElementById('2d-question').innerHTML = "Please identify the location of each source:";
 	document.getElementById('feedback').style.visibility = '';
 	document.getElementById('feedback').style.display = 'inline-block';

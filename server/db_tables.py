@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# db_path = 'postgresql://anniezheng@localhost/test2'
 db_path = 'postgresql://llmchqfhvdwpop:8f6b6899b24221c36bc979822c407c31bd099e3259c5d4f6682d63d993276d3f@ec2-34-230-167-186.compute-1.amazonaws.com:5432/dcoppvn70vslf9'
 
 eng = create_engine(db_path)
