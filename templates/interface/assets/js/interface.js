@@ -1,13 +1,28 @@
 // request to server
 var request = new XMLHttpRequest();
 var survey_id = '';
+var group_id = [];
+var recordings = []; // an array of recordings assigned to users
+var curr_recording = 0; // current recording number --> index
+var totalAudios = 6; // total number of audios user has to annotate
+
+ajax_start();
 
 function ajax_start(){
 	var request_start = new XMLHttpRequest();
 	request_start.open('POST', '/annotation_interface');
 	request_start.onreadystatechange = function() {
-		survey_id = request_start.response;
-		localStorage.setItem("survey_id", survey_id);
+		if (request_start.readyState == 4){
+			survey_id = JSON.parse(request_start.response)["survey_id"]["0"];
+			localStorage.setItem("survey_id", survey_id);
+			group_id = JSON.parse(request_start.response)["group_id"]["0"];
+
+			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings"] )) {
+				recordings.push(value);
+			}
+			document.getElementById('source').src = '/templates/interface/assets/audio/'+group_id.toString()+'/'+recordings[curr_recording];
+			document.getElementById('audio').load();
+		}
 	}
 	request_start.send();
 }
@@ -49,39 +64,55 @@ var curr_instruction = 1;
 var azimuth_item_index = 0;
 var elevation_item_index = 0;
 
-// current recording number
-var curr_recording = 0;
-var total_recording = 2;
-document.getElementById('source').src = '/templates/interface/assets/audio/recording/0.wav';
-document.getElementById('audio').load();
-
-
 document.getElementById('body').addEventListener("mouseup",function(){ 
-	// when user deletes nothing
 	delete_annotation = false;
 	document.getElementById('body').style.cursor = 'default';
 });
 
 document.getElementById('key-message').addEventListener("click",popKeyRules);
 document.getElementById('message').addEventListener("click",popRules);
-
 document.getElementById('instruction-left').addEventListener("click",move_instruction_last);
 document.getElementById('instruction-right').addEventListener("click",move_instruction_next);
 document.getElementById('instruction-proceed').addEventListener("click",closeRules);
 document.getElementById('sign').addEventListener("click",closeRules);
-
-document.getElementById('audio-frame-instruction').addEventListener("click",addSamplePlaying);
-document.getElementById('audio-instruction').addEventListener("ended",endSamplePlaying);
-document.getElementById('audio-instruction').addEventListener("timeupdate",audioSampleTracker);
-
 document.getElementById('audio-frame').addEventListener("click",addPlaying);
-document.getElementById('audio').addEventListener("ended",displaySelection);
+document.getElementById('audio').addEventListener("ended",display2D);
 document.getElementById('audio').addEventListener("timeupdate",audioTracker);
-
 document.getElementById('azimuth-plus').addEventListener("click",move_azimuth_plus);
 document.getElementById('elevation-plus').addEventListener("click",move_elevation_plus);
 document.getElementById('azimuth-minus').addEventListener("click",move_azimuth_minus);
 document.getElementById('elevation-minus').addEventListener("click",move_elevation_minus);
+
+document.addEventListener('click', function(e){
+	if (e.target.id.substring(0,23) == "audio-frame-instruction") {
+		isPlaying = false;
+		document.getElementById('audio').pause();
+		document.getElementById('audio-frame').innerHTML='Play Audio';
+		var audios = document.getElementsByClassName('audio-frame-instruction');
+		playing_id = ''
+		for(let i = 0; i < audios.length; i++) {
+			audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
+			if (audios[i].id != e.target.id) {
+				document.getElementById(audio_id).pause();
+				document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
+			}
+			else {
+				playing_id = audio_id;
+				document.getElementById(audios[i].id).innerHTML = document.getElementById(audios[i].id).innerHTML == 'Click to Play Sample Audio' ? 'Click to Pause Sample Audio' : 'Click to Play Sample Audio';
+				document.getElementById(audios[i].id).innerHTML == 'Click to Play Sample Audio' ? document.getElementById(audio_id).pause() : document.getElementById(audio_id).play();
+			}
+		}
+		document.getElementById(playing_id).addEventListener("timeupdate",function(){
+			if (playing_id.replace('audio-','') == e.target.id.replace('audio-frame-instruction-','')) {
+				let track = document.getElementById(playing_id).currentTime / document.getElementById(playing_id).duration * 100;
+				document.getElementById(e.target.id).style.background = 'linear-gradient(to right, #efefef '+ track +'%, #ffffff 0%)';
+			}
+		});
+		document.getElementById(playing_id).addEventListener("ended",function(){
+			document.getElementById(e.target.id).innerHTML = 'Click to Play Sample Audio';
+		});
+	}
+});
 
 function popKeyRules(e){
 	e.preventDefault();
@@ -91,8 +122,10 @@ function popKeyRules(e){
 function popRules(e){ 
 	e.preventDefault();
 	modal.style.display = "block";
-	if (read_all_rules) document.getElementById('sign').style.display = '';
-	document.getElementById('instruction-proceed').style.display = 'none';
+	if (read_all_rules) {
+		document.getElementById('sign').style.visibility = '';
+	}
+	document.getElementById('instruction-proceed').style.display = 'none'; // CLICK TO START
 	document.getElementById('instruction-right').style.display = '';
 	document.getElementById('instruction'+curr_instruction).style.display = 'none';
 	document.getElementById('instruction1').style.display = '';
@@ -101,18 +134,31 @@ function popRules(e){
 
 function closeRules(e){ 
 	e.preventDefault();
-	if (read_all_rules) modal.style.display = "none";
-	else window.alert("Please read all of the instructions first");
+	let audios = document.getElementsByClassName('audio-frame-instruction');
+	for (let i = 0; i < audios.length; i++) {
+		audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
+		document.getElementById(audio_id).pause();
+		document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
+	}
+	modal.style.display = "none";
 }
 
 function move_instruction_next(e){
 	e.preventDefault();
-	if (curr_instruction < 6) {
+	if (curr_instruction == 2){ // pause all audios
+		let audios = document.getElementsByClassName('audio-frame-instruction');
+		for (let i = 0; i < audios.length; i++) {
+			audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
+			document.getElementById(audio_id).pause();
+			document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
+		}
+	}
+	if (curr_instruction < 7) {
 		document.getElementById('instruction'+curr_instruction).style.display = 'none';
 		document.getElementById('instruction'+(curr_instruction+1)).style.display = '';
 		curr_instruction += 1;
 	}
-	if (curr_instruction == 6) {
+	if (curr_instruction == 7) {
 		document.getElementById("instruction-right").style.display = 'none';
 		document.getElementById("instruction-proceed").style.display = '';
 		read_all_rules = true;
@@ -121,7 +167,15 @@ function move_instruction_next(e){
 
 function move_instruction_last(e){
 	e.preventDefault();
-	if (curr_instruction > 6) {
+	if (curr_instruction > 1) {
+		if (curr_instruction == 2){ // pause all audios
+			let audios = document.getElementsByClassName('audio-frame-instruction');
+			for (let i = 0; i < audios.length; i++) {
+				audio_id = "audio" + audios[i].id.replace("audio-frame-instruction","");
+				document.getElementById(audio_id).pause();
+				document.getElementById(audios[i].id ).innerHTML = 'Click to Play Sample Audio';
+			}
+		}
 		document.getElementById("instruction-right").style.display = '';
 		document.getElementById("instruction-proceed").style.display = 'none';
 		document.getElementById('instruction'+curr_instruction).style.display = 'none';
@@ -130,27 +184,9 @@ function move_instruction_last(e){
 	}
 }
 
-function display2D(){
-	reloadAll();
-
-	document.getElementById('2d-question').innerHTML = "Please identify the location of each source:";
-	document.getElementById('2d').style.display = '';
-	document.getElementById('feedback').setAttribute('style',"display:inline-block;");
-	document.getElementById('head-wrapper').style.display = 'inline-block';
-	document.getElementById('front-wrapper').style.display = 'inline-block';
-	document.getElementById('side-wrapper').style.display = 'inline-block';
-
-	displayButton();
-}
-
 function audioTracker(){
 	let track = document.getElementById('audio').currentTime / document.getElementById('audio').duration * 100;
 	document.getElementById('audio-frame').style.background = 'linear-gradient(to right, #efefef '+track+'%, #ffffff 0%)';
-}
-
-function audioSampleTracker(){
-	let track = document.getElementById('audio-instruction').currentTime / document.getElementById('audio-instruction').duration * 100;
-	document.getElementById('audio-frame-instruction').style.background = 'linear-gradient(to right, #efefef '+track+'%, #ffffff 0%)';
 }
 
 function addPlaying(e){
@@ -172,39 +208,29 @@ function addPlaying(e){
 	}
 }
 
-function addSamplePlaying(e){
-	e.preventDefault();
-	if (!isPlaying){
-		document.getElementById('audio-instruction').play();
-		document.getElementById('audio-frame-instruction').innerHTML='Click to Pause Sample Audio';
-		isPlaying = true;
-	}
-	else{
-		isPlaying = false
-		document.getElementById('audio-instruction').pause();
-		document.getElementById('audio-frame-instruction').innerHTML='Click Again to Play Sample Audio';
-	}
-}
-
-function endSamplePlaying(){
+function display2D(){ 
 	isPlaying = false;
-	document.getElementById('audio-frame-instruction').innerHTML='Click Again to Play Sample Audio';
-	document.getElementById('audio-frame-instruction').style.background = 'linear-gradient(to right, #efefef 0%, #ffffff 0%)';
-}
-
-function displaySelection(){ 
-	isPlaying = false;
-	display2D();
+	document.getElementById('audio-frame').innerHTML='Play Audio';
+	reloadAll();
+	document.getElementById('2d-question').innerHTML = "Please identify the location of each source:";
+	document.getElementById('feedback').style.visibility = '';
+	document.getElementById('feedback').style.display = 'inline-block';
+	document.getElementById('dot-tracker').style.display = '';
+	document.getElementById('head-wrapper').style.display = 'inline-block';
+	document.getElementById('front-wrapper').style.display = 'inline-block';
+	document.getElementById('side-wrapper').style.display = 'inline-block';
+	displayButton();
 }
 
 function displayButton(){
-	if (curr_recording < total_recording) document.getElementById('btn-button-next').setAttribute('style','float:right;');
+	console.log(curr_recording);
+	if (curr_recording < totalAudios) document.getElementById('btn-button-next').setAttribute('style','float:right;');
 	else document.getElementById('btn-button-submit').setAttribute('style','float:right;');
 }
 
 function askProceed(){
-	if (azimuth_item_index < 1 && azimuth_item_index < 1 ) {
-		window.alert("You must annotate one azimuth AND one elevation"); 
+	if (azimuth_item_index != 1 || elevation_item_index != 1 ) {
+		window.alert("You must annotate one azimuth and one elevation"); 
 		return false;
 	}
 	return true;
@@ -224,38 +250,33 @@ function ajax_next(){
 	}
 	
 	let user_note = document.getElementById("user_note").value;
+	localStorage.setItem("user_note", user_note);
 	timestamp = Date.now();
 
 	request.open('POST', '/next', true);
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
-	var data = JSON.stringify({survey_id,curr_recording,curr_azimuth,curr_elevation,timestamp,user_note});
+    let file_name = recordings[curr_recording];
+	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note});
 	request.send(data);
 
-	curr_recording += 1
-	console.log(curr_recording);
+	curr_recording = curr_recording + 1;
 
-	if (curr_recording < total_recording) {
-		document.getElementById('source').src = '/templates/interface/assets/audio/recording/'+curr_recording+'.wav';
-		document.getElementById('audio').load();
-		document.getElementById('2d').style.display = 'none';
-		document.getElementById('2d-question').innerHTML = '';
-		document.getElementById('btn-button-next').style.display = 'none';
-	}
-	else if (curr_recording == total_recording){
-		document.getElementById('source').src = '/templates/interface/assets/audio/recording/'+curr_recording+'.wav';
-		document.getElementById('audio').load();
-		document.getElementById('2d').style.display = 'none';
-		document.getElementById('2d-question').innerHTML = '';
-		document.getElementById('btn-button-next').style.display = 'none';
-	}
-	else{
-		window.location = '/templates/interface/submit.html';
-	}
-
-	document.getElementById('audio-frame').innerHTML='Play Audio';
-	document.getElementById('audio-frame').style.background = 'linear-gradient(to right, #efefef 0%, #ffffff 0%)';
-
-	return true;
+	if (curr_recording > totalAudios) {
+        window.location = '/templates/interface/submit.html';
+    }
+    else{
+        reloadAll();
+        document.getElementById('2d-question').innerHTML = '';
+        document.getElementById('head-wrapper').style.display = 'none';
+        document.getElementById('front-wrapper').style.display = 'none';
+        document.getElementById('side-wrapper').style.display = 'none';
+        document.getElementById('feedback').style.visibility = 'hidden';
+        document.getElementById('dot-tracker').style.display = 'none';
+        document.getElementById('btn-button-next').style.display = 'none';
+        document.getElementById('audio-frame').style.background = 'linear-gradient(to right, #efefef 0%, #ffffff 0%)';
+        document.getElementById('source').src = '/templates/interface/assets/audio/'+group_id.toString()+'/'+recordings[curr_recording];
+        document.getElementById('audio').load();
+    }
 }
 
 function displayBoth(hasFront, index, temp_azimuth, degree){
@@ -896,7 +917,7 @@ function keyboardEvents(e){
 					return;
 				}
 
-				if ((azimuth_item_index > elevation_item_index) && elevation_item_index != 1) {
+				if ( azimuth_item_index > elevation_item_index ) {
 					window.alert("You must annotate an elevation"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
@@ -908,13 +929,11 @@ function keyboardEvents(e){
 					return;
 				}
 
-				azimuth_item_index += 1;
-
 				curr_azimuth = calculateAzimuth(e.pageX, e.pageY, head_cx, head_cy);
 				curr_azimuth = (curr_azimuth == 360 ? 0 : curr_azimuth);
 
-				if ( document.getElementById('front-item-'+azimuth_item_index).style.display != 'none' ){
-					original_front = parseInt(document.getElementById('circularF'+azimuth_item_index).style.transform.replace('rotate(','').replace('deg)',''));
+				if ( document.getElementById('front-item-1').style.display != 'none' ){
+					original_front = parseInt(document.getElementById('circularF1').style.transform.replace('rotate(','').replace('deg)',''));
 					if ( (original_front < 180 && curr_azimuth > 180)
 					|| (original_front > 180 && curr_azimuth < 180) ) {
 						window.alert("Your head view annotation does not match with your front view annotation"); 
@@ -928,54 +947,54 @@ function keyboardEvents(e){
 						return;
 					}
 
-					degree = parseInt(document.getElementById('circularF'+azimuth_item_index).style.transform.replace('rotate(','').replace('deg)',''));
+					degree = parseInt(document.getElementById('circularF1').style.transform.replace('rotate(','').replace('deg)',''));
 					
 					if ((curr_azimuth < 180 && degree > 180) || (curr_azimuth > 180 && degree < 180)){
-						document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)';
+						document.getElementById('circularF1').style.transform = 'rotate('+(360-degree)+'deg)';
 					}
 
 					if (curr_azimuth < 22.5 || curr_azimuth > 337.5){
-						document.getElementById('front-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularF'+azimuth_item_index).style.display = 'none';
+						document.getElementById('front-item-1').style.display = 'none';
+						document.getElementById('circularF1').style.display = 'none';
 
-						document.getElementById('side-item-'+azimuth_item_index).style.display = '';
-						document.getElementById('circularS'+azimuth_item_index).style.display = '';
-						if (degree > 180){ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)'; }
-						else{ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)'; }
+						document.getElementById('side-item-1').style.display = '';
+						document.getElementById('circularS1').style.display = '';
+						if (degree > 180){ document.getElementById('circularS1').style.transform = 'rotate('+(360-degree)+'deg)'; }
+						else{ document.getElementById('circularS1').style.transform = 'rotate('+degree+'deg)'; }
 					}
 					else if (curr_azimuth > 67.5 && curr_azimuth < 112.5){
-						document.getElementById('side-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularS'+azimuth_item_index).style.display = 'none';
+						document.getElementById('side-item-1').style.display = 'none';
+						document.getElementById('circularS1').style.display = 'none';
 					}
 					else if (curr_azimuth > 157.5 && curr_azimuth < 202.5){ 
-						document.getElementById('front-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularF'+azimuth_item_index).style.display = 'none';
+						document.getElementById('front-item-1').style.display = 'none';
+						document.getElementById('circularF1').style.display = 'none';
 
-						document.getElementById('side-item-'+azimuth_item_index).style.display = '';
-						document.getElementById('circularS'+azimuth_item_index).style.display = '';
-						if (degree < 180){ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)'; }
-						else{ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)'; }
+						document.getElementById('side-item-1').style.display = '';
+						document.getElementById('circularS1').style.display = '';
+						if (degree < 180){ document.getElementById('circularS1').style.transform = 'rotate('+(360-degree)+'deg)'; }
+						else{ document.getElementById('circularS1').style.transform = 'rotate('+degree+'deg)'; }
 					}
 					else if (curr_azimuth > 247.5 && curr_azimuth < 292.5){
-						document.getElementById('side-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularS'+azimuth_item_index).style.display = 'none';
+						document.getElementById('side-item-1').style.display = 'none';
+						document.getElementById('circularS1').style.display = 'none';
 					}
 					else{
-						document.getElementById('side-item-'+azimuth_item_index).style.display = '';
-						document.getElementById('circularS'+azimuth_item_index).style.display = '';
+						document.getElementById('side-item-1').style.display = '';
+						document.getElementById('circularS1').style.display = '';
 						if (curr_azimuth > 270 || curr_azimuth < 90){
-							if (degree < 180){ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)'; }
-							else{ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)';  }
+							if (degree < 180){ document.getElementById('circularS1').style.transform = 'rotate('+degree+'deg)'; }
+							else{ document.getElementById('circularS1').style.transform = 'rotate('+(360-degree)+'deg)';  }
 						}
 						else if (curr_azimuth < 270 && curr_azimuth > 90){
-							if (degree > 180){ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)';  }
-							else{ document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)';  }
+							if (degree > 180){ document.getElementById('circularS1').style.transform = 'rotate('+degree+'deg)';  }
+							else{ document.getElementById('circularS1').style.transform = 'rotate('+(360-degree)+'deg)';  }
 						}
 					}
 
 				}
-				else if ( document.getElementById('side-item-'+azimuth_item_index).style.display != 'none' ){
-					original_side = parseInt(document.getElementById('circularS'+azimuth_item_index).style.transform.replace('rotate(','').replace('deg)',''));
+				else if ( document.getElementById('side-item-1').style.display != 'none' ){
+					original_side = parseInt(document.getElementById('circularS1').style.transform.replace('rotate(','').replace('deg)',''));
 					if ( ((curr_azimuth < 90 || curr_azimuth > 270) && (original_side > 180))
 					|| ((curr_azimuth > 90 && curr_azimuth < 270) && (original_side < 180)) ) {
 						window.alert("Your head view annotation does not match with your side view annotation");
@@ -989,58 +1008,60 @@ function keyboardEvents(e){
 						return;
 					}
 
-					degree = parseInt(document.getElementById('circularS'+azimuth_item_index).style.transform.replace('rotate(','').replace('deg)',''));
+					degree = parseInt(document.getElementById('circularS1').style.transform.replace('rotate(','').replace('deg)',''));
 
 					if ( ((curr_azimuth > 270 || curr_azimuth < 90) && degree>180)
 						|| ((curr_azimuth < 270 && curr_azimuth > 90) && degree<180) ){
-							document.getElementById('circularS'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)'; 
+							document.getElementById('circularS1').style.transform = 'rotate('+(360-degree)+'deg)'; 
 					}
 
 					if (curr_azimuth < 22.5 || curr_azimuth > 337.5){
-						document.getElementById('front-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularF'+azimuth_item_index).style.display = 'none';
+						document.getElementById('front-item-1').style.display = 'none';
+						document.getElementById('circularF1').style.display = 'none';
 					}
 					else if (curr_azimuth > 67.5 && curr_azimuth < 112.5){
-						document.getElementById('side-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularS'+azimuth_item_index).style.display = 'none';
+						document.getElementById('side-item-1').style.display = 'none';
+						document.getElementById('circularS1').style.display = 'none';
 
-						document.getElementById('front-item-'+azimuth_item_index).style.display = '';
-						document.getElementById('circularF'+azimuth_item_index).style.display = '';
-						if (degree > 180){ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)'; }
-						else{ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)'; }
+						document.getElementById('front-item-1').style.display = '';
+						document.getElementById('circularF1').style.display = '';
+						if (degree > 180){ document.getElementById('circularF1').style.transform = 'rotate('+(360-degree)+'deg)'; }
+						else{ document.getElementById('circularF1').style.transform = 'rotate('+degree+'deg)'; }
 					}
 					else if (curr_azimuth > 157.5 && curr_azimuth < 202.5){ 
-						document.getElementById('front-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularF'+azimuth_item_index).style.display = 'none';
+						document.getElementById('front-item-1').style.display = 'none';
+						document.getElementById('circularF1').style.display = 'none';
 					}
 					else if (curr_azimuth > 247.5 && curr_azimuth < 292.5){
-						document.getElementById('side-item-'+azimuth_item_index).style.display = 'none';
-						document.getElementById('circularS'+azimuth_item_index).style.display = 'none';
+						document.getElementById('side-item-1').style.display = 'none';
+						document.getElementById('circularS1').style.display = 'none';
 
-						document.getElementById('front-item-'+azimuth_item_index).style.display = '';
-						document.getElementById('circularF'+azimuth_item_index).style.display = '';
-						if (degree < 180){ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)'; }
-						else{ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)'; }
+						document.getElementById('front-item-1').style.display = '';
+						document.getElementById('circularF1').style.display = '';
+						if (degree < 180){ document.getElementById('circularF1').style.transform = 'rotate('+(360-degree)+'deg)'; }
+						else{ document.getElementById('circularF1').style.transform = 'rotate('+degree+'deg)'; }
 					}
 					else{
-						document.getElementById('front-item-'+azimuth_item_index).style.display = '';
-						document.getElementById('circularF'+azimuth_item_index).style.display = '';
+						document.getElementById('front-item-1').style.display = '';
+						document.getElementById('circularF1').style.display = '';
 						if (curr_azimuth < 180){
-							if (degree > 180){ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)'; }
-							else{ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)';  }
+							if (degree > 180){ document.getElementById('circularF1').style.transform = 'rotate('+(360-degree)+'deg)'; }
+							else{ document.getElementById('circularF1').style.transform = 'rotate('+degree+'deg)';  }
 						}
 						else if (curr_azimuth > 180){
-							if (degree < 180){ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+(360-degree)+'deg)';  }
-							else{ document.getElementById('circularF'+azimuth_item_index).style.transform = 'rotate('+degree+'deg)'; }
+							if (degree < 180){ document.getElementById('circularF1').style.transform = 'rotate('+(360-degree)+'deg)';  }
+							else{ document.getElementById('circularF1').style.transform = 'rotate('+degree+'deg)'; }
 						}
 					}
 				}
 
-				document.getElementById('circular'+azimuth_item_index).setAttribute('style','');
-				document.getElementById('circular'+azimuth_item_index).style.transform = 'rotate('+curr_azimuth+'deg)';
-				document.getElementById('head-item-'+azimuth_item_index).setAttribute('style','');
+				azimuth_item_index += 1;
 
-				displayBall(curr_azimuth - 180, (curr_elevation != undefined ? curr_elevation : 0) , azimuth_item_index);
+				document.getElementById('circular1').setAttribute('style','');
+				document.getElementById('circular1').style.transform = 'rotate('+curr_azimuth+'deg)';
+				document.getElementById('head-item-1').setAttribute('style','');
+
+				displayBall(curr_azimuth - 180, (curr_elevation != undefined ? curr_elevation : 0) , 1);
 
 				document.getElementById('p-azimuth').innerHTML = curr_azimuth;
 				document.getElementById('p-elevation').innerHTML = (curr_elevation != undefined ? curr_elevation : 0);
@@ -1074,7 +1095,7 @@ function keyboardEvents(e){
 					return;
 				}
 
-				if ((elevation_item_index > azimuth_item_index) && azimuth_item_index != 1) {
+				if (elevation_item_index > azimuth_item_index) {
 					window.alert("You must annotate an azimuth"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
@@ -1086,8 +1107,6 @@ function keyboardEvents(e){
 					return;
 				}
 
-				elevation_item_index += 1;
-
 				temp_azimuth = calculateAzimuth(e.pageX, e.pageY, front_cx, front_cy);
 
 				if (curr_azimuth != undefined){
@@ -1096,74 +1115,76 @@ function keyboardEvents(e){
 					else if (curr_azimuth < 180 && temp_azimuth > 180){ temp_azimuth = 360 - temp_azimuth; }
 
 					if (curr_azimuth >= 22.5 && curr_azimuth <= 67.5) {
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 					}
 					else if (curr_azimuth >= 112.5 && curr_azimuth <= 157.5) {
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 					}
 					else if (curr_azimuth >= 202.5 && curr_azimuth <= 247.5) {
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 					}
 					else if (curr_azimuth >= 292.5 && curr_azimuth <= 337.5) {
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 					}
 					else{
 						if (curr_azimuth > 157.5 && curr_azimuth <= 180){
-							document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-							document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularS1').setAttribute('style','');
+							document.getElementById('circularS1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+							document.getElementById('side-item-1').setAttribute('style','');
 						}
 						else if (curr_azimuth < 202.5 && curr_azimuth > 180){
-							document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-							document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularS1').setAttribute('style','');
+							document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+							document.getElementById('side-item-1').setAttribute('style','');
 						}
 						else if (curr_azimuth > 337.5){
-							document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-							document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularS1').setAttribute('style','');
+							document.getElementById('circularS1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+							document.getElementById('side-item-1').setAttribute('style','');
 						}
 						else if (curr_azimuth < 22.5){
-							document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-							document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularS1').setAttribute('style','');
+							document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+							document.getElementById('side-item-1').setAttribute('style','');
 						}
 						else{
-							document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-							document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularF1').setAttribute('style','');
+							document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+							document.getElementById('front-item-1').setAttribute('style','');
 						}
 					}
 				}
 				else{
-					document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-					document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-					document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+					document.getElementById('circularF1').setAttribute('style','');
+					document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+					document.getElementById('front-item-1').setAttribute('style','');
 				}
+
+				elevation_item_index += 1;
 
 				// calculate the displayed elevation
 				if (temp_azimuth <= 180){ curr_elevation = 90 - temp_azimuth; }
@@ -1171,7 +1192,7 @@ function keyboardEvents(e){
 				
 				temp_azimuth = curr_azimuth != undefined ? curr_azimuth - 180 : -180;
 
-				displayBall(temp_azimuth, curr_elevation, elevation_item_index);
+				displayBall(temp_azimuth, curr_elevation, 1);
 
 				// display azimuth and elevation
 				document.getElementById('p-azimuth').innerHTML = (curr_azimuth != undefined ? curr_azimuth : 0);
@@ -1209,7 +1230,7 @@ function keyboardEvents(e){
 					return;
 				}
 
-				if ((elevation_item_index > azimuth_item_index) && azimuth_item_index != 1) {
+				if (elevation_item_index > azimuth_item_index) {
 					window.alert("You must annotate an azimuth"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
@@ -1221,8 +1242,6 @@ function keyboardEvents(e){
 					return;
 				}
 
-				elevation_item_index += 1;
-
 				temp_azimuth = calculateAzimuth(e.pageX, e.pageY, side_cx, side_cy);
 
 				if (curr_azimuth != undefined){
@@ -1231,74 +1250,76 @@ function keyboardEvents(e){
 					else if (curr_azimuth > 90 && curr_azimuth < 270){ if (temp_azimuth < 180){ temp_azimuth = 360 - temp_azimuth; } }
 					
 					if (curr_azimuth >= 22.5 && curr_azimuth <= 67.5) {
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 					}
 					else if (curr_azimuth >= 112.5 && curr_azimuth <= 157.5) {
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 					}
 					else if (curr_azimuth >= 202.5 && curr_azimuth <= 247.5) {
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 					}
 					else if (curr_azimuth >= 292.5 && curr_azimuth <= 337.5) {
-						document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-						document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularF1').setAttribute('style','');
+						document.getElementById('circularF1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+						document.getElementById('front-item-1').setAttribute('style','');
 
-						document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-						document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-						document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+						document.getElementById('circularS1').setAttribute('style','');
+						document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+						document.getElementById('side-item-1').setAttribute('style','');
 					}
 					else{
 						if (curr_azimuth > 67.5 && curr_azimuth <= 90){
-							document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-							document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularF1').setAttribute('style','');
+							document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+							document.getElementById('front-item-1').setAttribute('style','');
 						}
 						else if (curr_azimuth > 90 && curr_azimuth < 112.5){
-							document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-							document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularF1').setAttribute('style','');
+							document.getElementById('circularF1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+							document.getElementById('front-item-1').setAttribute('style','');
 						}
 						else if (curr_azimuth > 257.5 && curr_azimuth <= 270){
-							document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-							document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularF1').setAttribute('style','');
+							document.getElementById('circularF1').style.transform = 'rotate('+temp_azimuth+'deg)';
+							document.getElementById('front-item-1').setAttribute('style','');
 						}
 						else if (curr_azimuth > 270 && curr_azimuth < 292.5){
-							document.getElementById('circularF'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularF'+elevation_item_index).style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
-							document.getElementById('front-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularF1').setAttribute('style','');
+							document.getElementById('circularF1').style.transform = 'rotate('+(360-temp_azimuth)+'deg)';
+							document.getElementById('front-item-1').setAttribute('style','');
 						}
 						else{
-							document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-							document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-							document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+							document.getElementById('circularS1').setAttribute('style','');
+							document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+							document.getElementById('side-item-1').setAttribute('style','');
 						}
 					}
 				}
 				else{
-					document.getElementById('circularS'+elevation_item_index).setAttribute('style','');
-					document.getElementById('circularS'+elevation_item_index).style.transform = 'rotate('+temp_azimuth+'deg)';
-					document.getElementById('side-item-'+elevation_item_index).setAttribute('style','');
+					document.getElementById('circularS1').setAttribute('style','');
+					document.getElementById('circularS1').style.transform = 'rotate('+temp_azimuth+'deg)';
+					document.getElementById('side-item-1').setAttribute('style','');
 				}
+
+				elevation_item_index += 1;
 
 				// calculate the displayed elevation
 				if (temp_azimuth <= 180){ curr_elevation = 90 - temp_azimuth; }
@@ -1306,7 +1327,7 @@ function keyboardEvents(e){
 
 				temp_azimuth = curr_azimuth != undefined ? curr_azimuth - 180 : -180;
 
-				displayBall(temp_azimuth, curr_elevation, elevation_item_index);
+				displayBall(temp_azimuth, curr_elevation, 1);
 
 				// display azimuth and elevation
 				document.getElementById('p-azimuth').innerHTML = (curr_azimuth != undefined ? curr_azimuth : 0);
@@ -1338,27 +1359,22 @@ function keyboardEvents(e){
 
 function reloadAll(){
 	document.getElementById("user_note").value = "";
-
 	curr_azimuth = undefined;
 	curr_elevation = undefined;
 	azimuth_item_index = 0;
 	elevation_item_index = 0;
-
 	document.getElementById('circular1').style.display = 'none';
 	document.getElementById('circularF1').style.display = 'none';
 	document.getElementById('circularS1').style.display = 'none';
 	document.getElementById('head-item-1').style.display = 'none';
 	document.getElementById('front-item-1').style.display = 'none';
 	document.getElementById('side-item-1').style.display = 'none';
-
 	document.getElementById('p-azimuth').innerHTML = '';
 	document.getElementById('p-elevation').innerHTML = '';
 	document.getElementById('azimuth-dot').style.backgroundColor = '';
 	document.getElementById('elevation-dot').style.backgroundColor = '';
-
 	document.onmousedown = null; 
 	document.onkeydown = null;
-
 	removeAllBalls();
 }
 
@@ -1375,7 +1391,8 @@ document.getElementById('head-item-1').addEventListener("mousedown",function(e){
 		document.getElementById('circularF1').style.display = 'none';
 		document.getElementById('circularS1').style.display = 'none';
 
-		azimuth_item_index = 0;
+		elevation_item_index -= 1;
+		azimuth_item_index -= 1;
 
 		key_perform = false;
 		deleteBall(1);
@@ -1413,7 +1430,8 @@ document.getElementById('front-item-1').addEventListener("mousedown",function(e)
 		document.getElementById('circularF1').style.display = 'none';
 		document.getElementById('circularS1').style.display = 'none';
 		
-		elevation_item_index = 0;
+		elevation_item_index -= 1;
+		azimuth_item_index -= 1;
 
 		key_perform = false;
 		deleteBall(1);
@@ -1450,7 +1468,8 @@ document.getElementById('side-item-1').addEventListener("mousedown",function(e){
 		document.getElementById('circularF1').style.display = 'none';
 		document.getElementById('circularS1').style.display = 'none';
 
-		elevation_item_index = 0;
+		elevation_item_index -= 1;
+		azimuth_item_index -= 1;
 
 		key_perform = false;
 		deleteBall(1);

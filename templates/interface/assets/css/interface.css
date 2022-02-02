@@ -49,7 +49,7 @@ body{
 	display: flex;
 	margin: auto;
 	overflow: scroll;
-	width: 83%;
+	width: 80%;
 	height: 100vh;
 	background-color: white;
 }
@@ -78,7 +78,6 @@ body{
 }
 
 #btn-button-next,
-#btn-button-refresh,
 #btn-button-submit{
 	margin-top: 10px;
 	padding:5px;
@@ -89,14 +88,13 @@ body{
 }
 
 #btn-button-next:hover,
-#btn-button-refresh:hover,
 #btn-button-submit:hover,
 #message:hover,
 #key-message:hover{
 	background-color:#c7c7c7;
 }
 
-#audio-frame-full, #audio-frame, #audio-frame-instruction{
+#audio-frame, .audio-frame-instruction{
 	margin-bottom: 20px;
 	font-weight: bold;
 	text-align: center;
@@ -106,6 +104,15 @@ body{
 	border: 2px solid black;
 	background: linear-gradient(to right, #efefef 0%, #ffffff 0%);
 	cursor: pointer;
+}
+
+.audio-frame-instruction{
+	border: 1px solid black;
+	font-size: 11px;
+	width: 200px;
+	height: 25px;
+	display: inline-block;
+	margin: 0;
 }
 
 #head, #front, #side, #feedback{
@@ -150,8 +157,6 @@ body{
 	width: 15px; 
 	height: 15px;
 	border-radius: 50%;
-	
-	/* Numberic Text */
 	font-size: 12px;
 	font-weight: 900;
 	text-align: center;
@@ -164,8 +169,6 @@ body{
 	width: 25px; 
 	height: 25px;
 	border-radius: 50%;
-	
-	/* Numberic Text */
 	font-size: 17px;
 	font-weight: 900;
 	text-align: center;
@@ -182,40 +185,4 @@ body{
 
 #head-item-1, #front-item-1, #side-item-1{
 	background-color: #009dff;
-}
-
-#head-item-2, #front-item-2, #side-item-2{
-	background-color: #ff7f0e;
-}
-
-#head-item-3, #front-item-3, #side-item-3{
-	background-color: #00ff00;
-}
-
-#head-item-4, #front-item-4, #side-item-4{
-	background-color: #ff0000;
-}
-
-#head-item-5, #front-item-5, #side-item-5{
-	background-color: #9467bd;
-}
-
-#head-item-6, #front-item-6, #side-item-6{
-	background-color: #d3d3d3;
-}
-
-#head-item-7, #front-item-7, #side-item-7{
-	background-color: #c39b77;
-}
-
-#head-item-8, #front-item-8, #side-item-8{
-	background-color: #e377c2;
-}
-
-#head-item-9, #front-item-9, #side-item-9{
-	background-color: #bcbd22; 
-}
-
-#head-item-10, #front-item-10, #side-item-10{
-	background-color: #00ffff;
 }

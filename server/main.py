@@ -1,4 +1,3 @@
-from operator import methodcaller
 import uuid
 from sqlalchemy import *
 from sqlalchemy.sql import *
@@ -8,10 +7,17 @@ from db_tables import ses,eng,Annotation,Survey,Location,Interaction
 from random import randrange
 app = Flask(__name__,static_folder="../templates",template_folder="..")
 
-# server side ajaxes
+
 @app.route('/')
 def home():
-    return render_template('/templates/index.html')
+    result = eng.execute('''select num_annotation from "Recording" order by num_annotation asc limit 1''')
+    least_annotation = ''
+    for r in result:
+        least_annotation = int(dict(r)['num_annotation'])
+    if (least_annotation == 8):
+        return render_template('/templates/interface/finish.html')
+    else:
+        return render_template('/templates/index.html')
 
 
 @app.route('/annotation_interface', methods=['GET', 'POST'])
@@ -20,18 +26,36 @@ def start():
     entry = Survey(survey_id)
     ses.add(entry)
     ses.commit()
-    return str(survey_id)
+
+    while (True):
+        recording = randrange(8) # get random digit from 0 to 7
+        result = eng.execute('''select file_name, group_id, num_annotation from "Recording" where group_id='''+str(recording))
+        recordings = '''"recordings":{'''
+        index = 0
+        group_id = ''
+        for r in result:
+            if (int(dict(r)['num_annotation']) < 8):
+                recordings = recordings + '"' + str(index) + '":' + '"' + str(dict(r)['file_name']) + '",'
+                group_id = str(dict(r)['group_id'])
+                index += 1
+            else:
+                continue
+        
+        recordings = recordings[:len(recordings)-1] + "}"
+        group_id = '''"group_id":{"0":"''' + group_id + '"}'
+        survey_id = '''"survey_id":{"0":"''' + str(survey_id) + '"}'
+        return "{" + survey_id + "," + group_id + "," + recordings + "}"
 
 
 @app.route('/interaction', methods=['GET', 'POST'])
 def interaction():
     if request.method == 'POST':
         data = request.json
+        survey_id = data['survey_id']
         action_type = data['action_type']
         value = data['value']
-        survey_id = data['survey_id']
-        timestamp= datetime.fromtimestamp(data['timestamp'] / 1000)
-        entry = Interaction(survey_id,action_type,value,timestamp,False)
+        timestamp = datetime.fromtimestamp(data['timestamp'] / 1000)
+        entry = Interaction(survey_id,action_type,value,timestamp)
         ses.add(entry)
         ses.commit()
     return 'success'
@@ -41,25 +65,32 @@ def interaction():
 def next():
     if request.method == 'POST':
         data = request.json
-
         survey_id = data['survey_id']
-        recording_id = int(data['curr_recording']) + 1
+        file_name = data['file_name']
         user_note = data['user_note']
+
+        result_recording_id = eng.execute('''select id from "Recording" where file_name = '''+ "'" + file_name + "'")
+        for r in result_recording_id:
+            recording_id = dict(r)['id']
+
+        # update number of annotation in Recording table
+        eng.execute('''update "Recording" set num_annotation= num_annotation + 1 where id='''+ str(recording_id))
 
         # insert into Interaction table
         timestamp= datetime.fromtimestamp(data['timestamp'] / 1000)
-        entry = Interaction(survey_id,"submit",None,timestamp,False)
+        entry = Interaction(survey_id,"submit",None,timestamp)
         ses.add(entry)
         ses.commit()
 
         # insert into Annotation table
-        entry1 = Annotation(survey_id,recording_id,user_note,False)
+        entry1 = Annotation(survey_id,recording_id,user_note)
         ses.add(entry1)
         ses.commit()
 
+        # insert into Location table
         azimuth = data['curr_azimuth']
         elevation = data['curr_elevation']
-        entry2 = Location(survey_id,azimuth,elevation,False)
+        entry2 = Location(survey_id,azimuth,elevation)
         ses.add(entry2)
         ses.commit()
 
@@ -69,8 +100,8 @@ def next():
         
         eng.execute('''update "Interaction" set annotation_id='''+annotation_id+'''where annotation_id = '''  + "'" + survey_id + "'")
         eng.execute('''update "Location" set annotation_id='''+annotation_id+'''where annotation_id = '''  + "'" + survey_id + "'")
-        
-        return 'success'
+
+    return 'success'
 
 
 if __name__ =='__main__':
