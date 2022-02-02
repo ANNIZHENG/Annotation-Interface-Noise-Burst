@@ -40,20 +40,18 @@ def start():
                 found = True
                 break
         if (found):
-            break
+            recordings = '''"recordings":{'''
+            index = 0
+            group_id = ''
+            for r in result:
+                recordings = recordings + '"' + str(index) + '":' + '"' + str(dict(r)['file_name']) + '",'
+                index += 1
+            recordings = recordings[:len(recordings)-1] + "}"
+            group_id = '''"group_id":{"0":"''' + str(recording) + '"}'
+            survey_id = '''"survey_id":{"0":"''' + str(survey_id) + '"}'
+            return "{" + survey_id + "," + group_id + "," + recordings + "}"
         else:
             continue
-
-    recordings = '''"recordings":{'''
-    index = 0
-    group_id = ''
-    for r in result:
-        recordings = recordings + '"' + str(index) + '":' + '"' + str(dict(r)['file_name']) + '",'
-        index += 1
-    recordings = recordings[:len(recordings)-1] + "}"
-    group_id = '''"group_id":{"0":"''' + recording + '"}'
-    survey_id = '''"survey_id":{"0":"''' + str(survey_id) + '"}'
-    return "{" + survey_id + "," + group_id + "," + recordings + "}"
 
 
 @app.route('/interaction', methods=['GET', 'POST'])
