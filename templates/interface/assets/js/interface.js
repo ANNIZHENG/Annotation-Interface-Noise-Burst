@@ -1,22 +1,36 @@
 // request to server
 var request = new XMLHttpRequest();
 var survey_id = '';
-var group_id = [];
+
 var recordings = [];
+var group_id = 0;
+var recordings_practice = [];
+var group_id_practice = 0;
+
 var curr_recording = 0;
+var curr_practice_recording = 0;
 var totalAudios = 0;
+var totalPracticeAudios = 6;
+var practice = 0;
+
+if (localStorage.getItem('practice') == undefined){
+	practice = 1; // practice = true
+	curr_practice_recording = 0;
+	console.log("Practice Interface Started First");
+}
 
 ajax_start();
-
 function ajax_start(){
 	var request_start = new XMLHttpRequest();
 	request_start.open('POST', '/annotation_interface');
 	request_start.onreadystatechange = function() {
 		if (request_start.readyState == 4){
+			console.log(request_start.response);
+
 			survey_id = JSON.parse(request_start.response)["survey_id"]["0"];
 			localStorage.setItem("survey_id", survey_id);
-			group_id = JSON.parse(request_start.response)["group_id"]["0"];
 
+			group_id = JSON.parse(request_start.response)["group_id"]["0"];
 			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings"] )) {
 				recordings.push(value);
 				recordings.push(value);
@@ -24,12 +38,26 @@ function ajax_start(){
 				recordings.push(value);
 			}
 			recordings = shuffle(recordings);
+
+			group_id_practice = JSON.parse(request_start.response)["group_id_practice"]["0"];
+			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings_practice"] )) {
+				recordings_practice.push(value);
+				recordings_practice.push(value);
+				recordings_practice.push(value);
+				recordings_practice.push(value);
+			}
+			recordings_practice = shuffle(recordings_practice);
+
 			totalAudios = recordings.length - 1;
-			document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+
+			if (!practice) document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+			else document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
 			document.getElementById('audio').load();
 		}
 	}
-	request_start.send();
+	request_start.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+	var data = JSON.stringify({practice});
+	request_start.send(data);
 }
 
 /* Fisher-Yates Shuffle */
@@ -185,8 +213,27 @@ function display2D(){
 }
 
 function displayButton(){
-	if (curr_recording < totalAudios) document.getElementById('btn-button-next').setAttribute('style','float:right;');
-	else document.getElementById('btn-button-submit').setAttribute('style','float:right;');
+	if (!practice){
+		if (curr_recording < totalAudios) {
+			document.getElementById('btn-button-next').value = "NEXT";
+			document.getElementById('btn-button-next').style.display = '';
+		}
+		else {
+			document.getElementById('btn-button-next').style.display = 'none';
+			document.getElementById('btn-button-submit').style.display = '';
+		}
+	}
+	else{
+		if (curr_practice_recording < totalPracticeAudios) {
+			document.getElementById('btn-button-next').value = "NEXT";
+			document.getElementById('btn-button-next').style.display = '';
+		}
+		else{
+			document.getElementById('btn-button-next').value = "GO TO TASK";
+			document.getElementById('btn-button-next').style.display = '';
+			document.getElementById('btn-button-again').style.display = '';
+		}
+	}
 }
 
 function askProceed(){
@@ -200,44 +247,70 @@ function askProceed(){
 function ajax_interaction() {
 	request.open('POST', '/interaction', true);
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
-	var data = JSON.stringify({survey_id,action_type,value,timestamp});
+	var data = JSON.stringify({action_type,value,timestamp,survey_id,practice});
 	request.send(data);
 }
 
-function ajax_next(){
+function ajax_next(again, end){
 	if (!askProceed()){
 		event.preventDefault();
 		return false;
 	}
-	
+
 	let user_note = document.getElementById("user_note").value;
 	localStorage.setItem("user_note", user_note);
 	timestamp = Date.now();
-
 	request.open('POST', '/next', true);
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
-    let file_name = recordings[curr_recording];
-	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note});
+    let file_name = practice ? recordings[curr_practice_recording] : recordings[curr_recording];
+
+	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note,practice,end,group_id});
 	request.send(data);
 
-	curr_recording = curr_recording + 1;
+	console.log(document.getElementById('source').src);
 
-	if (curr_recording > totalAudios) {
-        window.location = '/templates/interface/submit.html';
-    }
-    else{
-        reloadAll();
-        document.getElementById('2d-question').innerHTML = '';
-        document.getElementById('head-wrapper').style.display = 'none';
-        document.getElementById('front-wrapper').style.display = 'none';
-        document.getElementById('side-wrapper').style.display = 'none';
-        document.getElementById('feedback').style.visibility = 'hidden';
-        document.getElementById('dot-tracker').style.display = 'none';
-        document.getElementById('btn-button-next').style.display = 'none';
-        document.getElementById('audio-frame').style.background = 'linear-gradient(to right, #efefef 0%, #ffffff 0%)';
-        document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
-        document.getElementById('audio').load();
-    }
+	if (again){
+		curr_practice_recording = 0;
+		practice = 1;
+		document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
+		document.getElementById('audio').load();
+	}
+	else{
+		if (practice){
+			curr_practice_recording += 1;
+			if (curr_practice_recording > totalPracticeAudios) {
+				document.getElementById('title').style.display = 'none';
+				practice = 0; // false
+				curr_recording = 0;
+				document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+				document.getElementById('audio').load();
+			}
+			else{
+				document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
+				document.getElementById('audio').load();
+			}
+		}
+		else{ // non-practice
+			curr_recording += 1;
+			if (curr_recording > totalAudios) {
+				window.location = '/templates/interface/submit.html';
+				return;
+			}
+			document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+			document.getElementById('audio').load();
+		}
+	}
+
+	reloadAll();
+	document.getElementById('2d-question').innerHTML = '';
+	document.getElementById('head-wrapper').style.display = 'none';
+	document.getElementById('front-wrapper').style.display = 'none';
+	document.getElementById('side-wrapper').style.display = 'none';
+	document.getElementById('feedback').style.visibility = 'hidden';
+	document.getElementById('dot-tracker').style.display = 'none';
+	document.getElementById('btn-button-next').style.display = 'none';
+	document.getElementById('btn-button-again').style.display = 'none';
+	document.getElementById('audio-frame').style.background = 'linear-gradient(to right, #efefef 0%, #ffffff 0%)';
 }
 
 function displayBoth(hasFront, index, temp_azimuth, degree){
@@ -867,7 +940,7 @@ function keyboardEvents(e){
 
 			if (enable_head){
 				if ( azimuth_item_index == 1 ){
-					window.alert("You have already enter 1 azimuth element"); 
+					window.alert("You have already enter 1 azimuth source"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
 					enable_head = false;
@@ -879,7 +952,7 @@ function keyboardEvents(e){
 				}
 
 				if ( azimuth_item_index > elevation_item_index ) {
-					window.alert("You must annotate an elevation"); 
+					window.alert("You must annotate an elevation source"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
 					enable_head = false;
@@ -1045,7 +1118,7 @@ function keyboardEvents(e){
 			}
 			else if (enable_front){
 				if ( elevation_item_index == 1 ){
-					window.alert("You have already enter 1 elevation element"); 
+					window.alert("You have already enter 1 elevation source"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
 					enable_front = false;
@@ -1057,7 +1130,7 @@ function keyboardEvents(e){
 				}
 
 				if (elevation_item_index > azimuth_item_index) {
-					window.alert("You must annotate an azimuth"); 
+					window.alert("You must annotate an azimuth source"); 
 					document.getElementById('body').style.cursor = 'default'; 
 					key_perform = false;
 					enable_front = false;

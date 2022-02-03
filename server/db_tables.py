@@ -23,11 +23,13 @@ class Annotation(Base):
     survey_id = Column(String)
     recording_id = Column(Integer)
     user_note = Column(String)
+    practice_round = Column(Boolean)
 
-    def __init__(self,survey_id,recording_id,user_note):
+    def __init__(self,survey_id,recording_id,user_note,practice_round):
         self.survey_id = survey_id
         self.recording_id = recording_id
         self.user_note = user_note
+        self.practice_round = practice_round
 
 
 class Interaction(Base):
@@ -38,12 +40,14 @@ class Interaction(Base):
     action_type = Column(String)
     value = Column(String)
     timestamp = Column(TIMESTAMP)
+    practice_round = Column(Boolean)
 
-    def __init__(self,annotation_id,action_type,value,timestamp):
+    def __init__(self,annotation_id,action_type,value,timestamp,practice_round):
         self.annotation_id = annotation_id
         self.action_type = action_type
         self.value = value
         self.timestamp = timestamp
+        self.practice_round = practice_round
 
 
 class Location(Base):
@@ -53,11 +57,13 @@ class Location(Base):
     annotation_id = Column(String)
     azimuth = Column(Integer)
     elevation = Column(Integer)
+    practice_round = Column(Boolean)
 
-    def __init__(self,annotation_id,azimuth,elevation):
+    def __init__(self,annotation_id,azimuth,elevation,practice_round):
         self.annotation_id = annotation_id
         self.azimuth = azimuth
         self.elevation = elevation
+        self.practice_round = practice_round
 
 
 Base.metadata.bind = eng
