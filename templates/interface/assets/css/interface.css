@@ -78,7 +78,8 @@ body{
 }
 
 #btn-button-next,
-#btn-button-submit{
+#btn-button-submit,
+#btn-button-again{
 	margin-top: 10px;
 	padding:5px;
 	width: 170px;
@@ -89,6 +90,7 @@ body{
 
 #btn-button-next:hover,
 #btn-button-submit:hover,
+#btn-button-again:hover,
 #message:hover,
 #key-message:hover{
 	background-color:#c7c7c7;
