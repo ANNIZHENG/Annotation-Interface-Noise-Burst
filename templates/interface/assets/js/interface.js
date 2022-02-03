@@ -10,7 +10,7 @@ var group_id_practice = 0;
 var curr_recording = 0;
 var curr_practice_recording = 0;
 var totalAudios = 0;
-var totalPracticeAudios = 6;
+var totalPracticeAudios = 0;
 var practice = 0;
 
 if (localStorage.getItem('practice') == undefined){
@@ -42,13 +42,14 @@ function ajax_start(){
 			group_id_practice = JSON.parse(request_start.response)["group_id_practice"]["0"];
 			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings_practice"] )) {
 				recordings_practice.push(value);
-				recordings_practice.push(value);
-				recordings_practice.push(value);
-				recordings_practice.push(value);
+				// recordings_practice.push(value);
+				// recordings_practice.push(value);
+				// recordings_practice.push(value);
 			}
-			recordings_practice = shuffle(recordings_practice);
+			// recordings_practice = shuffle(recordings_practice);
 
 			totalAudios = recordings.length - 1;
+			totalPracticeAudios = recordings_practice.length - 1;
 
 			if (!practice) document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
 			else document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
