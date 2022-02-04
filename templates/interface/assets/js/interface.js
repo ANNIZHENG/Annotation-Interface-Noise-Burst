@@ -880,7 +880,7 @@ function calculateRadius(mouseX, mouseY, frameX, frameY){
 	x = frameX - mouseX;
 	y = frameY - mouseY;
 	radius = Math.sqrt( Math.pow(x,2) + Math.pow(y,2) );
-	if ( radius <= 87 ) return true;
+	if ( radius <= 100 ) return true;
 	else return false;
 }
 

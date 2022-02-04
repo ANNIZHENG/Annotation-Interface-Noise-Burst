@@ -22,6 +22,7 @@ body{
 }
 
 .container-3D{
+	flex-shrink: 1.5;
 	background-color: black;
 }
 
@@ -80,7 +81,7 @@ body{
 #btn-button-next,
 #btn-button-submit,
 #btn-button-again{
-	margin-top: 10px;
+	margin-top: 5px;
 	padding:5px;
 	width: 170px;
 	border: 2px solid black;
@@ -111,7 +112,7 @@ body{
 .audio-frame-instruction{
 	border: 1px solid black;
 	font-size: 11px;
-	width: 200px;
+	width: 250px;
 	height: 25px;
 	display: inline-block;
 	margin: 0;
@@ -122,8 +123,8 @@ body{
 	vertical-align: middle;
 	display:inline-block;
 	position: relative;
-	height: 180px; 
-	width: 180px;
+	height: 200px; 
+	width: 200px;
 	background-size: cover;
 	font-size: 13px;
 }
@@ -147,24 +148,24 @@ body{
 
 #azimuth-dot, #elevation-dot{
 	border-radius: 50%; 
-	width: 10px; 
-	height: 10px;
+	width: 11px; 
+	height: 11px;
 	display: inline-block;
 	margin-right: 5px;
 }
 
 .indicator{
 	position: absolute;
-	margin-top: -55px;
-	width: 15px; 
-	height: 15px;
 	border-radius: 50%;
 	font-size: 12px;
+	margin-top: -65px;
+	width: 18px; 
+	height: 18px;
 	font-weight: 900;
 	text-align: center;
 }
 
-.confirm-indicator{
+/* .confirm-indicator{
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -174,14 +175,14 @@ body{
 	font-size: 17px;
 	font-weight: 900;
 	text-align: center;
-}
+} */
 
 .circular{
 	position: absolute;
-	margin-top: 55px;
-	width: 17px;
+	margin-top: 65px;
+	width: 18px;
 	height: 70px;
-	left: 82px;
+	left: 91.5px;
 	border: rgba(0,0,0,0) solid 0.5px;
 }
 
