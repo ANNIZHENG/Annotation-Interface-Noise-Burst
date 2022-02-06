@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<title>Annotation Interface</title>
-	<link rel="stylesheet" type="text/css" href="/templates/interface/assets/css/interface.css">
+	<link rel="stylesheet" type="text/css" href="/templates/interface/assets/css/main.css">
 	<style>
 	li{
 		margin-bottom: 7px;
@@ -16,17 +16,16 @@
 </head>
 <body id = "body">
 	<div class="container-3D"> 
-		<div id="title" style="position:absolute; color:#eeeeee; top:0px; font-size:60px;">Practice Round</div>
+		<div id="title" style="position:absolute; color:#eeeeee; top:0px; font-size:50px;">Practice Round</div>
 		<div id="3d-head" width="400"></div>
 	</div>
 	<div class="container" id = "container">
 		<div>
 			<button id="message">Instructions</button>
 			<button id="key-message">Keyboard Rules</button>
-			<h2>Please listen to the audio</h2>
+			<h3>Please listen to the audio and<br>localize the sound</h3>
 			<audio id="audio" controls style="display: none;"><source id = "source" type="audio/wav">Your browser does not support audio</audio>
-			<button id="audio-frame">Play Audio</button><br>
-			<label id="2d-question" for="2d" style="font-size: 16px; font-weight: bold;"></label>
+			<button id="audio-frame">Play Audio</button>
 			<div id="2d" style="margin-top: 5px;">
 				<div id="head-wrapper" style="display: none;"><div style="font-weight:bold; font-size:13px; color:blue; text-align: center;">Top View</div>
 					<div id="head" style="background-image: url('/templates/interface/img/head.png');">
@@ -35,14 +34,16 @@
 					</div>
 				</div>
 				<div id="feedback" style="visibility: hidden;">
-					<div id="dot-tracker" style="display: none;">
-						<div id='azimuth-dot'></div>azimuth: <button id='azimuth-minus'>-</button><div id='p-azimuth'"></div><button id='azimuth-plus'>+</button><br><br>
-						<div id='elevation-dot'></div>elevation: <button id='elevation-minus'>-</button><div id='p-elevation'"></div><button id='elevation-plus'>+</button>
-					</div>
-					<div style="margin-top:10px; font-size: 12px; color:blue; text-align:center; font-weight:bold; visibility: visible;">You May Take Notes Here</div>
-					<textarea id="user_note" style="font-size: 11px; width: 100%; height: 108px; background-color:#f0f8ff; z-index:2; visibility: visible;"></textarea>
-				</div>
-				<br>
+					<div id='azimuth-dot'></div>horizontal location:<br>
+					<button id='azimuth-minus'>-</button>
+					<div id='p-azimuth'></div>
+					<button id='azimuth-plus'>+</button><br><br>
+
+					<div id='elevation-dot'></div>vertical location:<br>
+					<button id='elevation-minus'>-</button>
+					<div id='p-elevation'></div>
+					<button id='elevation-plus'>+</button>
+				</div><br>
 				<div id="front-wrapper" style="display: none;"><div style="font-weight:bold; font-size:13px; color:blue; text-align: center;">Back View</div>
 					<div id="front" style="background-image: url('/templates/interface/img/front.png');">
 						<div class="circular" id="circularF"></div>
@@ -63,42 +64,73 @@
 			<div id="modal">
 				<div class="instructions">
 					<button class="move" id="instruction-left" style="margin-right: 20px;">&#8249;</button>
-					<div id="instruction1">
-						<p style="font-size: 17px;">Page 1 / 4</p>
-						<h3 style="text-align: center; color: blue; margin-top: 3vh;">Noise Bursts Annotation Interface Instructions</h3>
-						<img src="/templates/interface/img/1.png" style="width:70%; display: block; margin: auto;">
-						<p>You will be presented 28 recordings.</p>
-						<p>For each recording you will be asked to localize the sound you heard.</p>
-						<p>First you must play the recording.</p>
-						<p>1. To play the audio click "Play Audio".</p>
-						<p>2. If you want to pause the audio click "Pause Audio".</p>
-						<p>You may listen to the audio as many times as you want.</p>
-						<p>You can use the text box to take notes about where you heard the sound coming from. It might help you when localizing the sound.</p>
+					<div id="instruction1" style="margin: 0 auto;">
+						<p style="font-size: 17px;">&nbsp;</p>
+						<div>
+							<h2 style="text-align: center; color: blue; margin-top: 3vh;">Annotation Interface Instructions</h2><br>
+							<ul style="font-size: 20px;">
+								This task consists of 2 stages<br><br>
+								<li>Identification of the location of one sound source</li>
+								<li>Localization of that sound source</li>
+							</ul>
+						</div>
 					</div>
 					<div id="instruction2" style="display: none;">
+						<p style="font-size: 17px;">Page 1 / 4</p>
+						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
+						<img src="/templates/interface/img/1.png" style="width:70%; display: block; margin: auto;">
+						<p>The first stage is to identify the location of the sound</p>
+						<ul>
+							<li>Press the Play button to listen to the audio recording.</li>
+							<li>
+								You can use the text box to take notes. 
+								It might help you when localizing the sound.
+							</li>
+							<li>
+								You may listen to the audio as many times as you want.
+							</li>
+							<li>
+								There is a practice round with 7 audios. You must finished the whole practice round to proceed.
+							</li>
+							<li>
+								After that, you will be presented with 28 audios.
+							</li>
+						</ul>
+					</div>
+					<div id="instruction3" style="display: none;">
 						<p style="font-size: 17px;">Page 2 / 4</p>
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
 						<img src="/templates/interface/img/2.png" style="width:70%; display: block; margin: auto;">
-						<p>Once you’ve finished listening to the recording, you will see a 2D representation of the space, with 3 views. Please localize each of the sources identified.</p>
-						<p>The "top view" allows you to annotate azimuth or horizontal location.</p>
-						<p>The "back view" and "side view" allow you to annotate the elevation of the source.</p>
-						<p>You will see your annotation updated in real time in the 3D view to the left of your screen. You can rotate this view and zoom in or out but not annotate in it.</p>
+						<p>The second stage is to localize the sound.</p>
+						<ul>
+							<li>
+								After listening to the full audio recording, you will see a 2D representation of the space, with 3 views.
+							</li>
+							<li>
+								In this stage you will see 4 spatial displays: a 2D "top view" display on which you can annotate the horizontal spatial location; 
+								2D "back view" and "side view" displays on which you can annotate the vertical spatial location; and 
+								a rotatable 3D view which is just for displaying the spatial location annotations you create.
+							</li>
+						</ul>
 					</div>
-					<div id="instruction3" style="display: none;">
+					<div id="instruction4" style="display: none;">
 						<p style="font-size: 17px;">Page 3 / 4</p>
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
 						<img src="/templates/interface/img/3.png" style="width:70%; display: block; margin: auto;">
-						<p>To add a new source press "Option" or "Alt" + click.</p>
-						<p>To remove a source press "Command" or "Win" + click.</p>
-						<p>You can always see the rules in the "Keyboard Rules" button.</p>
-						<p>To create a successful annotation, you must select a horizontal position in the “top view” and an elevation position in at least one of the “back” or “side” views. Please verify the location is correct in the 3D representation to the left of your screen.</p>
+						<ul>
+							<li>To add a new annotation press key Option or Alt and click.</li>
+							<li>To remove a annotation press key Command or Win and click.</li>
+							<li>You can always see the rules in the "Keyboard Rules" button.</li>
+							<li>
+								To annotate the spatial location of the sound source, you must select a horizontal spatial location and a vertical spatial location.
+							</li>
+						</ul>
 					</div>
-					<div id="instruction4" style="display: none;">
+					<div id="instruction5" style="display: none;">
 						<p style="font-size: 17px;">Page 4 / 4</p>
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
 						<img src="/templates/interface/img/4.png" style="width:70%; display: block; margin: auto;">
-						<p>If you need to adjust the location of the sources, you may click on the desired point and move it, or use the [+] and [-] buttons.</p>
-						<p>Click submit once you have completed your annotation.</p>
+						<p>If you need to adjust the location of the sources, you may click on the desired point and move it, or use the + and - buttons.</p>
 					</div>
 					<span id="sign" style="visibility: hidden;">&times;</span>
 					<button class="move" id="instruction-proceed" style="margin-left: 20px; font-size: 30px; padding:11px; display: none;">
@@ -107,6 +139,10 @@
 					<button class="move" id="instruction-right" style="margin-left: 20px;">&#8250;</button>
 				</div>
 			</div>
+		</div>
+		<div style="margin-left: 10px;">
+			<div style="font-size: 14px; color:blue; text-align:center; font-weight:bold;">You May Take Notes Here</div>
+			<textarea id="user_note" style="z-index: 1;"></textarea>
 		</div>
 	</div>
 	<script src="//cdn.rawgit.com/mrdoob/three.js/master/build/three.js"></script>
