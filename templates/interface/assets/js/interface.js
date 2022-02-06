@@ -16,7 +16,6 @@ var practice = 0;
 if (localStorage.getItem('practice') == undefined){
 	practice = 1; // practice = true
 	curr_practice_recording = 0;
-	console.log("Practice Interface Started First");
 }
 
 ajax_start();
@@ -42,11 +41,7 @@ function ajax_start(){
 			group_id_practice = JSON.parse(request_start.response)["group_id_practice"]["0"];
 			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings_practice"] )) {
 				recordings_practice.push(value);
-				// recordings_practice.push(value);
-				// recordings_practice.push(value);
-				// recordings_practice.push(value);
 			}
-			// recordings_practice = shuffle(recordings_practice);
 
 			totalAudios = recordings.length - 1;
 			totalPracticeAudios = recordings_practice.length - 1;
@@ -265,8 +260,6 @@ function ajax_next(again, end){
 
 	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note,practice,end,group_id});
 	request.send(data);
-
-	console.log(document.getElementById('source').src);
 
 	if (again){
 		curr_practice_recording = 0;
