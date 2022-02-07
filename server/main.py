@@ -53,14 +53,14 @@ def start():
             elif (recording == 1):
                 recording_practice = 8
 
-        result = eng.execute('''select group_num_annotation from "Recording" where group_id='''+str(recording))
+        result = eng.execute('''select group_num_annotation from "Recording" where group_id = '''+str(recording))
 
         for r in result:
             group_num_annotation = int(dict(r)['group_num_annotation'])
             if (group_num_annotation == 8):
                 break
             else:
-                result = eng.execute('''select file_name from "Recording" where group_id='''+str(recording))
+                result = eng.execute('''select file_name from "Recording" where group_id = '''+str(recording))
                 recordings = '''"recordings":{'''
                 index = 0
                 group_id = ''
@@ -71,7 +71,7 @@ def start():
                 group_id = '''"group_id":{"0":"''' + str(recording) + '"}'
 
 
-                result = eng.execute('''select file_name from "Recording" where group_id='''+str(recording_practice))
+                result = eng.execute('''select file_name from "Recording" where group_id = '''+str(recording_practice))
                 recordings_practice = '''"recordings_practice":{'''
                 index = 0
                 group_id_practice = ''
@@ -114,7 +114,7 @@ def next():
         end = bool(int(data['end']))
         group_id = data['group_id']
 
-        result_recording_id = eng.execute('''select recording_id from "Recording" where file_name = '''+ "'" + file_name + "'")
+        result_recording_id = eng.execute('''select recording_id from "Recording" where file_name = ''' + "'" + file_name + "'")
         for r in result_recording_id:
             recording_id = dict(r)['recording_id']
 
@@ -134,12 +134,12 @@ def next():
         result = eng.execute('''select id from "Annotation" where survey_id = ''' + "'" + survey_id + "' order by id desc limit 1")
         for r in result:
             annotation_id = str(dict(r)['id'])
-        eng.execute('''update "Interaction" set annotation_id='''+annotation_id+'''where annotation_id = '''  + "'" + survey_id + "'")
-        eng.execute('''update "Location" set annotation_id='''+annotation_id+'''where annotation_id = '''  + "'" + survey_id + "'")
+        eng.execute('''update "Interaction" set annotation_id = ''' + "'" + annotation_id + "'" + ''' where annotation_id = '''  + "'" + survey_id + "'")
+        eng.execute('''update "Location" set annotation_id = ''' + "'" +annotation_id + "'" +''' where annotation_id = '''  + "'" + survey_id + "'")
 
         if (end):
-            eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id='''+str(group_id))
-            eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id='''+str(group_id))
+            eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id = ''' + str(group_id))
+            eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id = ''' + str(group_id))
 
     return 'success'
 
