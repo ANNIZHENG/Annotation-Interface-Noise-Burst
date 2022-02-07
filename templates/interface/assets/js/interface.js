@@ -125,7 +125,7 @@ document.getElementById('elevation-minus').addEventListener("click",move_elevati
 
 function popKeyRules(e){
 	e.preventDefault();
-	window.alert("Press [Option] or [Alt] key to add an annotation once you see the cursor turning to. Press [Command] or [Win] key to delete an annotation once you see the cursor turning to '-'. Deleting an annotation means to delete both its annotated horizontal location and vertical location.")
+	window.alert("Press [Option] or [Alt] key to add an annotation once you see the cursor turning to. Press [Command] or [Win] key to delete an annotation once you see the cursor turning to '-'. Deleting an annotation means to delete both its annotated horizontal location and vertical location.\n\nKeep in mind you must annotate at the blue circle.")
 }
 
 function popRules(e){ 
@@ -390,7 +390,7 @@ function move_azimuth_plus(e){
 	e.preventDefault();
 
 	if (document.getElementById('head-item-1').style.display == 'none'){
-		window.alert("Please annotate the sound first using the 2D views"); 
+		window.alert("Please annotate or click to select an annotation first using the 2D views"); 
 		return false; 
 	}
 
@@ -429,7 +429,7 @@ function move_azimuth_minus(e){
 	e.preventDefault();
 
 	if (document.getElementById('head-item-1').style.display == 'none'){ 
-		window.alert("Please annotate the sound first using the 2D views"); 
+		window.alert("Please annotate or click to select an annotation first using the 2D views"); 
 		return false; 
 	}
 
@@ -469,7 +469,7 @@ function move_elevation_plus(e){
 
 	if (document.getElementById('front-item-1').style.display == 'none' 
 	&& document.getElementById('side-item-1').style.display == 'none' ){
-		window.alert("Please annotate the sound first using the 2D views"); 
+		window.alert("Please annotate or click to select an annotation first using the 2D views"); 
 		return false; 
 	}
 
@@ -518,7 +518,7 @@ function move_elevation_plus(e){
 function move_elevation_minus(e){
 	e.preventDefault();
 	if (document.getElementById('front-item-1').style.display == 'none' && document.getElementById('side-item-1').style.display == 'none' ){ 
-		window.alert("Please annotate the sound first using the 2D views"); 
+		window.alert("Please annotate or click to select an annotation first using the 2D views"); 
 		return false; 
 	}
 
