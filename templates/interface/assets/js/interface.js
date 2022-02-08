@@ -125,7 +125,7 @@ document.getElementById('elevation-minus').addEventListener("click",move_elevati
 
 function popKeyRules(e){
 	e.preventDefault();
-	window.alert("Press [Option] or [Alt] key to add an annotation once you see the cursor turning to. Press [Command] or [Win] key to delete an annotation once you see the cursor turning to '-'. Deleting an annotation means to delete both its annotated horizontal location and vertical location.\n\nKeep in mind you must annotate at the blue circle.")
+	window.alert("Press [Option] or [Alt] key to add an annotation once you see the cursor turning to ‘+’. Press [Command] or [Win] key to delete an annotation once you see the cursor turning to ‘-’. Deleting an annotation means to delete both its annotated horizontal location and vertical location. You must annotate on the blue circle.")
 }
 
 function popRules(e){ 
