@@ -1615,6 +1615,29 @@ var frame = new THREE.Mesh(frameGeometry, frameMaterial);
 var edgesGeometry = new THREE.EdgesGeometry(frameGeometry);
 var wireframe = new THREE.LineSegments(edgesGeometry, new THREE.LineBasicMaterial({color: 0x0000ff})); 
 
+var frontGeometry = new THREE.TorusGeometry(15,0.1,30,100);
+var frontMaterial = new THREE.MeshLambertMaterial({
+	color: 0x808000
+});
+var front = new THREE.Mesh(frontGeometry, frontMaterial);
+front.position.set(0,0,0);
+
+
+var sideGeometry = new THREE.TorusGeometry(15,0.1,30,100);
+var sideMaterial = new THREE.MeshLambertMaterial({
+	color: 0x964b00
+});
+var side = new THREE.Mesh(sideGeometry, sideMaterial);
+side.rotation.y = Math.PI / 2;
+
+
+var headGeometry = new THREE.TorusGeometry(15,0.1,30,100);
+var headMaterial = new THREE.MeshLambertMaterial({
+	color: 0x6a0dad
+});
+var head = new THREE.Mesh(headGeometry, headMaterial);
+head.rotation.x = Math.PI / 2;
+
 var ballGeometry;
 var ballMaterial;
 
@@ -1664,6 +1687,9 @@ function removeAllBalls(){
 	}
 }
 scene.add(wireframe);
+scene.add(head);
+scene.add(side);
+scene.add(front);
 scene.add(sphere);
 scene.add(ear1);
 scene.add(ear2);
