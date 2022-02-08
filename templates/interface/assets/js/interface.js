@@ -232,7 +232,7 @@ function displayButton(){
 
 function askProceed(){
 	if (azimuth_item_index != 1 || elevation_item_index != 1 ) {
-		window.alert("You must annotate one spatial location (meaning a horizontal location and a vertical location)"); 
+		window.alert("You must annotate one spatial location"); 
 		return false;
 	}
 	return true;
