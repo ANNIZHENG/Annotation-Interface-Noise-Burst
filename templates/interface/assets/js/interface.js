@@ -885,7 +885,7 @@ var enable_side = false;
 var delete_annotation = false;
 var add_third = false;
 
-document.addEventListener("keydown", keyboardEvents);
+document.addEventListener("click", keyboardEvents);
 function keyboardEvents(e){
 	
 	if(e.metaKey){
@@ -956,7 +956,7 @@ function keyboardEvents(e){
 					enable_head = false;
 
 					// prevent undesired events
-					document.onmousedown = null;
+					document.onclick = null;
 					document.onkeydown = null; 
 					return;
 				}
@@ -968,7 +968,7 @@ function keyboardEvents(e){
 					enable_head = false;
 
 					// prevent undesired events
-					document.onmousedown = null;
+					document.onclick = null;
 					document.onkeydown = null; 
 					return;
 				}
@@ -986,7 +986,7 @@ function keyboardEvents(e){
 						enable_head = false;
 
 						// prevent undesired events
-						document.onmousedown = null;
+						document.onclick = null;
 						document.onkeydown = null;
 						return;
 					}
@@ -1047,7 +1047,7 @@ function keyboardEvents(e){
 						enable_head = false;
 
 						// prevent undesired events
-						document.onmousedown = null;
+						document.onclick = null;
 						document.onkeydown = null;
 						return;
 					}
@@ -1118,7 +1118,7 @@ function keyboardEvents(e){
 				enable_head = false;
 
 				// prevent undesired events
-				document.onmousedown = null;
+				document.onclick = null;
 				document.onkeydown = null;
 
 				value = (curr_azimuth == 360 ? 0 : curr_azimuth);
@@ -1134,7 +1134,7 @@ function keyboardEvents(e){
 					enable_front = false;
 
 					// prevent undesired events
-					document.onmousedown = null;
+					document.onclick = null;
 					document.onkeydown = null;
 					return;
 				}
@@ -1146,7 +1146,7 @@ function keyboardEvents(e){
 					enable_front = false;
 
 					// prevent undesired events
-					document.onmousedown = null;
+					document.onclick = null;
 					document.onkeydown = null;
 					return;
 				}
@@ -1253,7 +1253,7 @@ function keyboardEvents(e){
 				enable_front = false;
 
 				// prevent undesired events
-				document.onmousedown = null;
+				document.onclick = null;
 				document.onkeydown = null;
 
 				value = curr_elevation
@@ -1269,7 +1269,7 @@ function keyboardEvents(e){
 					enable_side = false;
 
 					// prevent undesired events
-					document.onmousedown = null; 
+					document.onclick = null;
 					document.onkeydown = null;
 					return;
 				}
@@ -1281,7 +1281,7 @@ function keyboardEvents(e){
 					enable_side = false;
 
 					// prevent undesired events
-					document.onmousedown = null; 
+					document.onclick = null;
 					document.onkeydown = null;
 					return;
 				}
@@ -1385,7 +1385,7 @@ function keyboardEvents(e){
 				enable_side = false;
 
 				// prevent undesired events
-				document.onmousedown = null; 
+				document.onclick = null;
 				document.onkeydown = null;
 
 				value = curr_elevation
