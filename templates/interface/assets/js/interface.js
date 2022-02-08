@@ -871,6 +871,14 @@ function calculateRadius(mouseX, mouseY, frameX, frameY){
 	else return false;
 }
 
+function calculate3dClick(mouseX, mouseY, frameX, frameY){
+	x = frameX - mouseX;
+	y = frameY - mouseY;
+	radius = Math.sqrt( Math.pow(x,2) + Math.pow(y,2) );
+	if ( radius <= 200 ) return true;
+	else return false;
+}
+
 var enable_head = false;
 var enable_front = false;
 var enable_side = false;
@@ -905,12 +913,16 @@ function keyboardEvents(e){
 	head_frameLocation = document.getElementById('circular').getBoundingClientRect();
 	front_frameLocation = document.getElementById('circularF').getBoundingClientRect();
 	side_frameLocation = document.getElementById('circularS').getBoundingClientRect();
+	three_frameLocation = document.getElementById('3d-head').getBoundingClientRect();
+
 	head_cx = ( head_frameLocation.right + head_frameLocation.left ) / 2;
 	head_cy = ( head_frameLocation.top + head_frameLocation.bottom ) / 2;
 	front_cx = ( front_frameLocation.right + front_frameLocation.left ) / 2;
 	front_cy = ( front_frameLocation.top + front_frameLocation.bottom ) / 2;
 	side_cx = ( side_frameLocation.right + side_frameLocation.left ) / 2;
 	side_cy = ( side_frameLocation.top + side_frameLocation.bottom ) / 2;
+	three_cx = ( three_frameLocation.right + three_frameLocation.left ) / 2;
+	three_cy = ( three_frameLocation.top + three_frameLocation.bottom ) / 2;
 
 	if (e.altKey){
 		// disable deleting events
@@ -925,6 +937,16 @@ function keyboardEvents(e){
 			enable_head = calculateRadius(e.pageX, e.pageY, head_cx, head_cy);
 			enable_front = calculateRadius(e.pageX, e.pageY, front_cx, front_cy);
 			enable_side = calculateRadius(e.pageX, e.pageY, side_cx, side_cy);
+			click_3d_head = calculate3dClick(e.pageX, e.pageY, three_cx, three_cy);
+
+			if (click_3d_head){
+				window.alert("Please annotate the sound using the 2D views"); 
+				document.getElementById('body').style.cursor = 'default'; 
+				key_perform = false;
+				document.onclick = null;
+				document.onkeydown = null; 
+				return;
+			}
 
 			if (enable_head){
 				if ( azimuth_item_index == 1 ){
