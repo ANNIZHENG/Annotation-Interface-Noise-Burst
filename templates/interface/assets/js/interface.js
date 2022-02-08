@@ -885,7 +885,7 @@ var enable_side = false;
 var delete_annotation = false;
 var add_third = false;
 
-document.addEventListener("click", keyboardEvents);
+document.addEventListener("keydown", keyboardEvents);
 function keyboardEvents(e){
 	
 	if(e.metaKey){
@@ -932,7 +932,7 @@ function keyboardEvents(e){
 
 		key_perform = true;
 
-		document.addEventListener('mousedown', function(e){
+		document.addEventListener('click', function(e){
 
 			enable_head = calculateRadius(e.pageX, e.pageY, head_cx, head_cy);
 			enable_front = calculateRadius(e.pageX, e.pageY, front_cx, front_cy);
