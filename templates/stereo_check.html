@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stereo Sound Headphone Check | Annotation Interface</title>
+    <style>
+      body {
+        box-sizing: border-box;
+        font-family: Monaco;
+        margin: auto;
+        margin-top: 7vh;
+        max-width: 60%;
+        display: flex;
+        flex-direction: column;
+        background-color: #e5e5e5;
+      }
+      button { margin-right: 30px; height: 25px; width: 50px;}
+      input[type=checkbox] { margin-right: 10px; height: 17px; width: 17px;}
+      input[type=submit] { width: 250px; height: 25px; font-size: 17px;}
+      div{ margin-bottom: 15px; }
+      #questions { overflow: scroll; }
+    </style>
+</head>
+<body id="body" onload="setUp()">
+    <div>You must also pass this <b>Stereo Sound Check</b> to use the Annotation Interface!</div>
+    <div>Please make sure you are <b>wearing headphones</b>!</div>
+    <div>Press the Play to play the audio. You will hear one sound.</div>
+    <div style="margin-bottom:30px;">Simply judge the position (left or right) of the sound.</div>
+    <div id="questions"></div>
+    <input id="submit" type="submit" value="Enter Annotation Interface" onclick="checkAll()" />
+
+    <script src="/templates/StereoCheck.js"></script>
+</body>
+</html>

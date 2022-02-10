@@ -137,15 +137,15 @@ Contact Ray Gonzalez raygon@mit.edu or Kevin J. P. Woods kwoods@mit.edu
     // render boilerplate instruction text
     $('<div/>', {
       class: 'hc-instruction',
-      html: '<p> When you hit <b>Play</b>, you will hear three sounds separated by silences. </p>'
+      html: '<div> When you hit <b>Play</b>, you will hear three sounds separated by silences. </div>'
     }).appendTo($('#hc-container'));
     $('<div/>', {
       class: 'hc-instruction',
-      html: '<p> Simply judge WHICH SOUND WAS SOFTEST (quietest) -- 1, 2, or 3? </p>'
+      html: '<div> Simply judge WHICH SOUND WAS SOFTEST (quietest) -- 1, 2, or 3? </div>'
     }).appendTo($('#hc-container'));
     $('<div/>', {
       class: 'hc-instruction',
-      html: '<p> Test sounds can only be played once! </p>'
+      html: '<div> Test sounds can only be played once! </div>'
     }).appendTo($('#hc-container'));
 
     if (headphoneCheckConfig.debug) console.log(headphoneCheckData);
@@ -230,24 +230,24 @@ Contact Ray Gonzalez raygon@mit.edu or Kevin J. P. Woods kwoods@mit.edu
     // render boilerplate instruction text
     $('<div/>', {
       class: 'hc-calibration-instruction',
-      html: '<p> You must pass this <b>Headphone Check</b> to use the Annotation Interface! </p>'
+      html: '<div> You must pass this <b>Headphone Check</b> to use the Annotation Interface! </div>'
     }).appendTo($('#hc-container'));
     $('<div/>', {
       class: 'hc-calibration-instruction',
-      html: '<p> Please make sure <b>you are wearing headphones</b>! </p>'
+      html: '<div> Please make sure <b>you are wearing headphones</b>! </div>'
     }).appendTo($('#hc-container'));
     $('<div/>', {
       class: 'hc-calibration-instruction',
-      html: '<p> First, set your computer volume to about 25% of maximum. </p>'
+      html: '<div> First, set your computer volume to about 25% of maximum. </div>'
     }).appendTo($('#hc-container'));
     $('<div/>', {
       class: 'hc-calibration-instruction',
-      html: '<p> Press the <b>[Play]</b> button, then turn up the volume on your computer until the ' +
-            'calibration noise is at a loud but comfortable level. </p>'
+      html: '<div> Press the Play button, then turn up the volume on your computer until the ' +
+            'calibration noise is at a loud but comfortable level. </div>'
     }).appendTo($('#hc-container'));
     $('<div/>', {
       id: 'hc-calibration-div',
-      html: '<p> Play the calibration sound as many times as you like. </p>'
+      html: '<div> Play the calibration sound as many times as you like. </div>'
     }).appendTo($('#hc-container'));
 
     //add in the audio source
@@ -270,7 +270,7 @@ Contact Ray Gonzalez raygon@mit.edu or Kevin J. P. Woods kwoods@mit.edu
 
     $('<div/>', {
       class: 'hc-calibration-instruction',
-      html: '<p> Press <b>[Continue]</b> when level calibration is complete. </p>',
+      html: '<div> Press Continue when level calibration is complete. </div>',
     }).appendTo($('#hc-container'));
 
     // Add button to continue
