@@ -85,13 +85,12 @@ function setUp(){
 }
 
 document.getElementById("submit").onclick = function(e){
-    // TODO: Refresh to another page
     for (let i = 0; i < 6; i++){
         if (!document.getElementById('radio-'+i+"-left").checked && !document.getElementById('radio-'+i+"-right").checked){
             event.preventDefault();
             document.getElementById("main").style.display = 'none';
             let error_text = document.createElement('div');
-            error_text.innerHTML = "You must select either Left or Right for each audio";
+            error_text.innerHTML = "Screening task failed. Your headphones do not meet the qualifications for the task.";
             document.getElementById("body").appendChild(error_text);
             return;
         }
@@ -100,7 +99,7 @@ document.getElementById("submit").onclick = function(e){
                 event.preventDefault();
                 document.getElementById("main").style.display = 'none';
                 let error_text = document.createElement('div');
-                error_text.innerHTML = "You've selected at least one wrong choice";
+                error_text.innerHTML = "Screening task failed. Your headphones do not meet the qualifications for the task.";
                 document.getElementById("body").appendChild(error_text);
                 return;
             }
@@ -110,12 +109,12 @@ document.getElementById("submit").onclick = function(e){
                 event.preventDefault();
                 document.getElementById("main").style.display = 'none';
                 let error_text = document.createElement('div');
-                error_text.innerHTML = "You've selected at least one wrong choice";
+                error_text.innerHTML = "Screening task failed. Your headphones do not meet the qualifications for the task.";
                 document.getElementById("body").appendChild(error_text);
                 return;
             }
         }
     }
     localStorage.setItem('stereo',1);
-    window.location = '/templates/interface/interface.html';
+    window.location = '/templates/interface/practice.html';
 };

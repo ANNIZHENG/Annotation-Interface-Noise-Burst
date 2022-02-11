@@ -230,7 +230,7 @@ Contact Ray Gonzalez raygon@mit.edu or Kevin J. P. Woods kwoods@mit.edu
     // render boilerplate instruction text
     $('<div/>', {
       class: 'hc-calibration-instruction',
-      html: '<div> You must pass this <b>Headphone Check</b> to use the Annotation Interface! </div>'
+      html: '<div> You must pass <b>two(2)</b> screenings to enter the task:<br>1. a Headphone Check and<br>2. a Stereo Sound Check</div>'
     }).appendTo($('#hc-container'));
     $('<div/>', {
       class: 'hc-calibration-instruction',

@@ -26,10 +26,8 @@ function ajax_start(){
 	request_start.open('POST', '/annotation_interface');
 	request_start.onreadystatechange = function() {
 		if (request_start.readyState == 4){
-			// console.log(request_start.response);
 
-			survey_id = JSON.parse(request_start.response)["survey_id"]["0"];
-			localStorage.setItem("survey_id", survey_id);
+			survey_id = localStorage.getItem("survey_id");
 
 			group_id = JSON.parse(request_start.response)["group_id"]["0"];
 			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings"] )) {
@@ -127,7 +125,7 @@ document.getElementById('elevation-minus').addEventListener("click",move_elevati
 
 function popKeyRules(e){
 	e.preventDefault();
-	window.alert("Press [Option] or [Alt] key to add an annotation once you see the cursor turning to ‘+’. Press [Command] or [Win] key to delete an annotation once you see the cursor turning to ‘-’. Deleting an annotation means to delete both its annotated horizontal location and vertical location. You must annotate on the blue circle.")
+	window.alert("Press [Option] or [Alt] key to add an annotation once you see the cursor turning to ‘+’. Press [Control] or [Ctrl] key to delete an annotation once you see the cursor turning to ‘-’. Deleting an annotation means to delete both its annotated horizontal location and vertical location.")
 }
 
 function popRules(e){ 
@@ -145,16 +143,47 @@ function popRules(e){
 
 function closeRules(e){ 
 	e.preventDefault();
+
+	let videos = document.getElementsByTagName('video');
+	for(let i = 0; i<videos.length; i++){
+		videos[i].pause();
+	}
+
 	modal.style.display = "none";
 }
 
 function move_instruction_next(e){
 	e.preventDefault();
+
+	if (curr_instruction == 1) {
+		document.getElementById('instruction-video-1').currentTime = 0;
+		document.getElementById('instruction-video-1').play();
+	}
+
+	if (curr_instruction == 2) {
+		if ( !read_all_rules && (document.getElementById('instruction-video-1').currentTime != document.getElementById('instruction-video-1').duration) ) {
+			window.alert("Please finish watching the current video first");
+			return;
+		}
+		document.getElementById('instruction-video-1').pause();
+		document.getElementById('instruction-video-2').currentTime = 0;
+		document.getElementById('instruction-video-2').play();
+	}
+
+	if (curr_instruction == 3){
+		if ( !read_all_rules && (document.getElementById('instruction-video-2').currentTime != document.getElementById('instruction-video-2').duration) ) {
+			window.alert("Please finish watching the current video first");
+			return;
+		}
+		document.getElementById('instruction-video-2').pause();
+	}
+
 	if (curr_instruction < 5) {
 		document.getElementById('instruction'+curr_instruction).style.display = 'none';
 		document.getElementById('instruction'+(curr_instruction+1)).style.display = '';
 		curr_instruction += 1;
 	}
+
 	if (curr_instruction == 5) {
 		document.getElementById("instruction-right").style.display = 'none';
 		document.getElementById("instruction-proceed").style.display = '';
@@ -165,6 +194,22 @@ function move_instruction_next(e){
 function move_instruction_last(e){
 	e.preventDefault();
 	if (curr_instruction > 1) {
+
+		if (curr_instruction == 2) {
+			document.getElementById('instruction-video-1').pause();
+		}
+
+		if (curr_instruction == 3){
+			document.getElementById('instruction-video-2').pause();
+			document.getElementById('instruction-video-1').currentTime = 0;
+			document.getElementById('instruction-video-1').play();
+		}
+
+		if (curr_instruction == 4) {
+			document.getElementById('instruction-video-2').currentTime = 0;
+			document.getElementById('instruction-video-2').play();
+		}
+
 		document.getElementById("instruction-right").style.display = '';
 		document.getElementById("instruction-proceed").style.display = 'none';
 		document.getElementById('instruction'+curr_instruction).style.display = 'none';
@@ -890,7 +935,9 @@ var add_third = false;
 document.addEventListener("keydown", keyboardEvents);
 function keyboardEvents(e){
 	
-	if(e.metaKey){
+	if(e.ctrlKey){
+		e.preventDefault();
+
 		document.getElementById('body').style.cursor = "url('/templates/interface/img/minus.svg'), auto";
 
 		// disable adding events
@@ -927,6 +974,8 @@ function keyboardEvents(e){
 	three_cy = ( three_frameLocation.top + three_frameLocation.bottom ) / 2;
 
 	if (e.altKey){
+		e.preventDefault();
+
 		// disable deleting events
 		delete_annotation = false;
 
@@ -1452,7 +1501,7 @@ document.getElementById('head-item-1').addEventListener("mousedown",function(e){
 
 		// disable further deletion
 		delete_annotation = false;
-		e.metaKey = false;
+		e.ctrlKey = false;
 
 		// prevent undesired events
 		document.onmousedown = null; 
@@ -1498,7 +1547,7 @@ document.getElementById('front-item-1').addEventListener("mousedown",function(e)
 		
 		// disable further deletion
 		delete_annotation = false;
-		e.metaKey = false;
+		e.ctrlKey = false;
 
 		// prevent undesired events
 		document.onmousedown = null; 
@@ -1543,7 +1592,7 @@ document.getElementById('side-item-1').addEventListener("mousedown",function(e){
 		
 		// disable further deletion
 		delete_annotation = false;
-		e.metaKey = false;
+		e.ctrlKey = false;
 
 		// prevent undesired events
 		document.onmousedown = null; 

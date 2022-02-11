@@ -68,10 +68,34 @@
 		<p> 
 			You have received a copy of this consent document to keep.
 		</p>
-		<button style="height: 40px; font-size: 15px; float: right; cursor: pointer;"> I Have Read and Agreed With the Above Statement </button>
+		<button style="height: 40px; font-size: 15px; float: right; cursor: pointer;" onclick="ajax_interaction()"> I Have Read and Agreed With the Above Statement </button>
 	</form>
 	<script>
 		localStorage.clear();
+
+		ajax_start();
+
+		var survey_id = undefined;
+		function ajax_start(){
+			var request = new XMLHttpRequest();
+			request.open('POST', '/agree_consent');
+			request.onreadystatechange = function() {
+				survey_id = request.response;
+				localStorage.setItem("survey_id", survey_id);
+			}
+		request.send();
+		}
+		function ajax_interaction() {
+			var request = new XMLHttpRequest();
+			request.open('POST', '/interaction', true);
+			request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+			let action_type = "agree consent form";
+			let value = null;
+			let timestamp = Date.now();
+			let practice = 0;
+			var data = JSON.stringify({survey_id,action_type,value,timestamp,practice});
+			request.send(data);
+		}
 	</script>
 </body>
 </html>

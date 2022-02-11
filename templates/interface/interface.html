@@ -61,7 +61,7 @@
 			<input id="btn-button-submit" type="submit" name="btn-button-submit" value="SUBMIT" onclick="ajax_next(false, 1)" style="float:right; display: none;">
 			<input id="btn-button-again" type="submit" name="btn-button-again" value="PRACTICE AGAIN" onclick="ajax_next(true, 0)" style="float:left; display: none;">
 
-			<div id="modal">
+			<div id="modal"> <!-- TODO: Change Instructions -->
 				<div class="instructions">
 					<button class="move" id="instruction-left" style="margin-right: 20px;">&#8249;</button>
 					<div id="instruction1" style="margin: 0 auto;">
@@ -77,7 +77,11 @@
 					<div id="instruction2" style="display: none;">
 						<p style="font-size: 17px;">Page 1 / 4</p>
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
-						<img src="/templates/interface/img/1.png" style="width:70%; display: block; margin: auto;">
+						<!-- <img src="/templates/interface/img/1.png" style="width:70%; display: block; margin: auto;"> -->
+						<video id="instruction-video-1" style="width:70%; display: block; margin: auto;">
+							Your browser does not support video
+							<source src="/templates/interface/img/1.mp4" type="video/mp4">
+						</video>
 						<ul>
 							<li>
 								Press the Play button to listen to the audio recording.
@@ -96,16 +100,24 @@
 								You may listen to the audio as many times as you want.
 							</li>
 						</ul>
+						<p>
+							We expect this task to take around 25 minutes of your time. You will be paid $6.5 for completing the task.
+						</p>
 					</div>
 					<div id="instruction3" style="display: none;">
 						<p style="font-size: 17px;">Page 2 / 4</p>
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
-						<img src="/templates/interface/img/2.png" style="width:70%; display: block; margin: auto;">
+						<!-- <img src="/templates/interface/img/2.png" style="width:70%; display: block; margin: auto;"> -->
+						<video id="instruction-video-2" style="width:70%; display: block; margin: auto;">
+							Your browser does not support video
+							<source src="/templates/interface/img/2.mp4" type="video/mp4">
+						</video>
 						<ul>
 							<li>
 								You will see 4 spatial displays: a 2D "top view" display on which you can annotate the horizontal spatial location; 
 								a 2D “back view” display on which you can annotate the vertical spatial location if a sound is to either side of you; 
-								a “side  view” display on which you can annotate the vertical spatial location if a sound is in front or behind you.
+								a “side  view” display on which you can annotate the vertical spatial location if a sound is in front or behind you;
+								and a rotatable 3D view which is just for displaying the spatial location annotations you create.
 							</li>
 						</ul>
 					</div>
@@ -115,7 +127,7 @@
 						<img src="/templates/interface/img/3.png" style="width:70%; display: block; margin: auto;">
 						<ul>
 							<li>To add a new annotation press key Option or Alt and click on the desired 2D view.</li>
-							<li>To remove an annotation press key Command or Win and click on the desired annotation.</li>
+							<li>To remove an annotation press key Control or Ctrl and click on the desired annotation.</li>
 							<li>You can always see the rules in the "Keyboard Rules" button.</li>
 							<li>
 								To annotate the spatial location of the sound, you must select a horizontal spatial location and a vertical spatial location.

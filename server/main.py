@@ -19,15 +19,17 @@ def home():
     else:
         return render_template('/templates/index.html')
 
-
-@app.route('/annotation_interface', methods=['GET', 'POST'])
-def start():
+@app.route('/agree_consent', methods=['GET', 'POST'])
+def agree():
     survey_id = uuid.uuid4()
     entry = Survey(survey_id)
     ses.add(entry)
     ses.commit()
+    return str(survey_id)
 
-    survey_id = '''"survey_id":{"0":"''' + str(survey_id) + '"}'
+
+@app.route('/annotation_interface', methods=['GET', 'POST'])
+def start():
 
     data = request.json
     practice = bool(int(data['practice']))
@@ -81,7 +83,7 @@ def start():
                 recordings_practice = recordings_practice[:len(recordings_practice)-1] + "}"
                 group_id_practice = '''"group_id_practice":{"0":"''' + str(recording_practice) + '"}'
 
-                return "{" + survey_id + "," + group_id + "," + recordings + "," + group_id_practice + "," + recordings_practice + "}"
+                return "{" + group_id + "," + recordings + "," + group_id_practice + "," + recordings_practice + "}"
 
 
 @app.route('/interaction', methods=['GET', 'POST'])
