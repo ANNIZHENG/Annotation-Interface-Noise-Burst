@@ -16,20 +16,21 @@
         flex-direction: column;
       }
       button { margin-right: 30px; height: 25px; width: 50px;}
-      input[type=checkbox] { margin-right: 10px; height: 17px; width: 17px;}
+      input[type=radio] { margin-right: 10px; height: 17px; width: 17px;}
       input[type=submit] { width: 250px; height: 25px; font-size: 17px;}
       div{ margin-bottom: 15px; }
       #questions { overflow: scroll; }
     </style>
 </head>
 <body id="body" onload="setUp()">
+  <div id="main">
     <div>You must also pass this <b>Stereo Sound Check</b> to use the Annotation Interface!</div>
     <div>Please make sure you are <b>wearing headphones</b>!</div>
-    <div>Press the Play to play the audio. You will hear one sound.</div>
-    <div style="margin-bottom:30px;">Simply judge the position (left or right) of the sound.</div>
+    <div>Press Play to play the audio. You will hear one sound.</div>
+    <div style="margin-bottom:30px;">Judge the position (left or right) of the sound.</div>
     <div id="questions"></div>
     <input id="submit" type="submit" value="Enter Annotation Interface" onclick="checkAll()" />
-
     <script src="/templates/StereoCheck.js"></script>
+  </div>
 </body>
 </html>
