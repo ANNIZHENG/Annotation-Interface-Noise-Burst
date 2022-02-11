@@ -13,7 +13,7 @@ var totalAudios = 0;
 var totalPracticeAudios = 0;
 var practice = 0;
 
-const audio_path = 'https://assets-audio.s3.amazonaws.com/';
+const audio_path = 'https://assets-audio.s3.amazonaws.com/audio/';
 
 if (localStorage.getItem('practice') == undefined){
 	practice = 1; // practice = true
