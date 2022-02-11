@@ -117,5 +117,5 @@ document.getElementById("submit").onclick = function(e){
         }
     }
     localStorage.setItem('stereo',1);
-    window.location = '/templates/interface/practice.html';
+    window.location = '/templates/interface/interface.html';
 };
