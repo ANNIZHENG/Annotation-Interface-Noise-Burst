@@ -26,7 +26,7 @@ function ajax_start(){
 	request_start.open('POST', '/annotation_interface');
 	request_start.onreadystatechange = function() {
 		if (request_start.readyState == 4){
-			console.log(request_start.response);
+			// console.log(request_start.response);
 
 			survey_id = JSON.parse(request_start.response)["survey_id"]["0"];
 			localStorage.setItem("survey_id", survey_id);
