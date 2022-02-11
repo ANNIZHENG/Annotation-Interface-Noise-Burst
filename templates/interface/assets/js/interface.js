@@ -13,6 +13,8 @@ var totalAudios = 0;
 var totalPracticeAudios = 0;
 var practice = 0;
 
+const audio_path = 'https://assets-audio.s3.amazonaws.com/';
+
 if (localStorage.getItem('practice') == undefined){
 	practice = 1; // practice = true
 	curr_practice_recording = 0;
@@ -46,8 +48,8 @@ function ajax_start(){
 			totalAudios = recordings.length - 1;
 			totalPracticeAudios = recordings_practice.length - 1;
 
-			if (!practice) document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
-			else document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
+			if (!practice) document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+			else document.getElementById('source').src = audio_path + 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
 			document.getElementById('audio').load();
 		}
 	}
@@ -264,7 +266,7 @@ function ajax_next(again, end){
 	if (again){
 		curr_practice_recording = 0;
 		practice = 1;
-		document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
+		document.getElementById('source').src = audio_path + 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
 		document.getElementById('audio').load();
 	}
 	else{
@@ -274,11 +276,11 @@ function ajax_next(again, end){
 				document.getElementById('title').style.display = 'none';
 				practice = 0;
 				curr_recording = 0;
-				document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+				document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
 				document.getElementById('audio').load();
 			}
 			else{
-				document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
+				document.getElementById('source').src = audio_path + 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
 				document.getElementById('audio').load();
 			}
 		}
@@ -288,7 +290,7 @@ function ajax_next(again, end){
 				window.location = '/templates/interface/submit.html';
 				return;
 			}
-			document.getElementById('source').src = '/templates/interface/assets/audio/'+ 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+			document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
 			document.getElementById('audio').load();
 		}
 	}
