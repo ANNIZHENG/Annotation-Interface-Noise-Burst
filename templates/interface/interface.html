@@ -61,7 +61,7 @@
 			<input id="btn-button-submit" type="submit" name="btn-button-submit" value="SUBMIT" onclick="ajax_next(false, 1)" style="float:right; display: none;">
 			<input id="btn-button-again" type="submit" name="btn-button-again" value="PRACTICE AGAIN" onclick="ajax_next(true, 0)" style="float:left; display: none;">
 
-			<div id="modal"> <!-- TODO: Change Instructions -->
+			<div id="modal">
 				<div class="instructions">
 					<button class="move" id="instruction-left" style="margin-right: 20px;">&#8249;</button>
 					<div id="instruction1" style="margin: 0 auto;">
@@ -86,12 +86,8 @@
 							<li>
 								Press the Play button to listen to the audio recording.
 							</li>
-							<li>
-								There is a practice round of 7 recordings. You must finish the practice round to proceed.
-							</li>
-							<li>
-								After the practice round, you will be presented with 28 recordings.
-							</li>
+							<!-- <li>There is a practice round of 7 recordings. You must finish the practice round to proceed.</li>
+							<li>After the practice round, you will be presented with 28 recordings.</li> -->
 							<li>
 								You can use the text box to take notes. 
 								It might help you when localizing the sound.
@@ -139,6 +135,7 @@
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
 						<img src="/templates/interface/img/4.png" style="width:70%; display: block; margin: auto;">
 						<p>If you need to adjust the location of the sound, you may click on the desired point and move it, or use the + and - buttons.</p>
+						<h3 style="text-align: center; color: blue;">You will go through a practice round first. You can repeat the practice round if needed.</h3>
 					</div>
 					<span id="sign" style="visibility: hidden;">&times;</span>
 					<button class="move" id="instruction-proceed" style="margin-left: 20px; font-size: 30px; padding:11px; display: none;">
