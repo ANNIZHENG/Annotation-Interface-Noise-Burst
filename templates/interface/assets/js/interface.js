@@ -144,6 +144,13 @@ function popRules(e){
 function closeRules(e){ 
 	e.preventDefault();
 
+	if (!read_all_rules && document.getElementById('instruction-video-4').currentTime != document.getElementById('instruction-video-4').duration) {
+		window.alert("Please finish watching the current video first");
+		return;
+	}
+
+	read_all_rules = true;
+
 	let videos = document.getElementsByTagName('video');
 	for(let i = 0; i<videos.length; i++){
 		videos[i].pause();
@@ -176,6 +183,18 @@ function move_instruction_next(e){
 			return;
 		}
 		document.getElementById('instruction-video-2').pause();
+		document.getElementById('instruction-video-3').currentTime = 0;
+		document.getElementById('instruction-video-3').play();
+	}
+
+	if (curr_instruction == 4){
+		if ( !read_all_rules && (document.getElementById('instruction-video-3').currentTime != document.getElementById('instruction-video-3').duration) ) {
+			window.alert("Please finish watching the current video first");
+			return;
+		}
+		document.getElementById('instruction-video-3').pause();
+		document.getElementById('instruction-video-4').currentTime = 0;
+		document.getElementById('instruction-video-4').play();
 	}
 
 	if (curr_instruction < 5) {
@@ -187,7 +206,7 @@ function move_instruction_next(e){
 	if (curr_instruction == 5) {
 		document.getElementById("instruction-right").style.display = 'none';
 		document.getElementById("instruction-proceed").style.display = '';
-		read_all_rules = true;
+		// read_all_rules = true;
 	}
 }
 
@@ -206,8 +225,15 @@ function move_instruction_last(e){
 		}
 
 		if (curr_instruction == 4) {
+			document.getElementById('instruction-video-3').pause();
 			document.getElementById('instruction-video-2').currentTime = 0;
 			document.getElementById('instruction-video-2').play();
+		}
+
+		if (curr_instruction == 5) {
+			document.getElementById('instruction-video-4').pause();
+			document.getElementById('instruction-video-3').currentTime = 0;
+			document.getElementById('instruction-video-3').play();
 		}
 
 		document.getElementById("instruction-right").style.display = '';

@@ -64,7 +64,7 @@
 			<div id="modal">
 				<div class="instructions">
 					<button class="move" id="instruction-left" style="margin-right: 20px;">&#8249;</button>
-					<div id="instruction1" style="margin: 0 auto; position: relative;">
+					<div id="instruction1" style="margin: 0 auto;">
 						<p style="font-size: 17px;">&nbsp;</p>
 						<div>
 							<h2 style="text-align: center; color: blue; margin-top: 3vh;">Annotation Interface Instructions</h2><br>
@@ -72,10 +72,10 @@
 								This task consists of localizing one sound<br><br>
 								You will be asked to listen to 28 recordings and localize each sound
 							</p>
+							<h3 style="text-align: center;">
+								<br>We expect this task to take around 25 minutes of your time.<br>You will be paid $6.5 for completing the task.
+							</h3>
 						</div>
-						<h4 style="position: absolute; bottom: 10px; left: 0px;">
-							We expect this task to take around 25 minutes of your time. You will be paid $6.5 for completing the task.
-						</h4>
 					</div>
 					<div id="instruction2" style="display: none;">
 						<p style="font-size: 17px;">Page 1 / 4</p>
@@ -117,7 +117,11 @@
 					<div id="instruction4" style="display: none;">
 						<p style="font-size: 17px;">Page 3 / 4</p>
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
-						<img src="/templates/interface/img/3.png" style="width:70%; display: block; margin: auto;">
+						<!-- <img src="/templates/interface/img/3.png" style="width:70%; display: block; margin: auto;"> -->
+						<video id="instruction-video-3" style="width:70%; display: block; margin: auto;">
+							Your browser does not support video
+							<source src="/templates/interface/img/3.mp4" type="video/mp4">
+						</video>
 						<ul>
 							<li>To add a new annotation press key Option or Alt and click on the desired 2D view.</li>
 							<li>To remove an annotation press key Control or Ctrl and click on the desired annotation.</li>
@@ -130,7 +134,11 @@
 					<div id="instruction5" style="display: none;">
 						<p style="font-size: 17px;">Page 4 / 4</p>
 						<h3 style="text-align: center; color: blue;">Noise Bursts Annotation Interface Instructions</h3>
-						<img src="/templates/interface/img/4.png" style="width:70%; display: block; margin: auto;">
+						<!-- <img src="/templates/interface/img/4.png" style="width:70%; display: block; margin: auto;"> -->
+						<video id="instruction-video-4" style="width:70%; display: block; margin: auto;">
+							Your browser does not support video
+							<source src="/templates/interface/img/4.mp4" type="video/mp4">
+						</video>
 						<p>If you need to adjust the location of the sound, you may click on the desired point and move it, or use the + and - buttons.</p>
 						<h3 style="text-align: center; color: blue;">You will go through a practice round first. You can repeat the practice round if needed.</h3>
 					</div>

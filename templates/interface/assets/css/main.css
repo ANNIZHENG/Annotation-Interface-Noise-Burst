@@ -166,13 +166,13 @@ body{
 }
 
 .indicator{
+	height: 18px;
+	width: 18px;
 	position: absolute;
 	font-weight: 900;
 	text-align: center;
 	border-radius: 50%;
 	margin-top: -65px;
-	height: 18px;
-	width: 18px;
 	font-size: 12px;
 }
 
