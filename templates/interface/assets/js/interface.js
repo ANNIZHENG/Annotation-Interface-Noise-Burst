@@ -303,7 +303,7 @@ function ajax_next(again, end){
 	timestamp = Date.now();
 	request.open('POST', '/next', true);
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
-    let file_name = practice ? recordings[curr_practice_recording] : recordings[curr_recording];
+    let file_name = practice ? recordings_practice[curr_practice_recording] : recordings[curr_recording];
 
 	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note,practice,end,group_id});
 	request.send(data);
