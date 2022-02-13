@@ -7,7 +7,6 @@ from db_tables import ses,eng,Annotation,Survey,Location,Interaction
 from random import randrange
 app = Flask(__name__,static_folder="../templates",template_folder="..")
 
-
 @app.route('/')
 def home():
     result = eng.execute('''select group_num_annotation from "Recording" order by group_num_annotation asc limit 1''')
@@ -26,7 +25,6 @@ def agree():
     ses.add(entry)
     ses.commit()
     return str(survey_id)
-
 
 @app.route('/annotation_interface', methods=['GET', 'POST'])
 def start():
@@ -85,7 +83,6 @@ def start():
 
                 return "{" + group_id + "," + recordings + "," + group_id_practice + "," + recordings_practice + "}"
 
-
 @app.route('/interaction', methods=['GET', 'POST'])
 def interaction():
     if request.method == 'POST':
@@ -102,7 +99,6 @@ def interaction():
         ses.commit()
     return 'success'
 
-
 @app.route('/next', methods=['GET', 'POST'])
 def next():
     if request.method == 'POST':
@@ -113,8 +109,8 @@ def next():
         azimuth = data['curr_azimuth']
         elevation = data['curr_elevation']
         practice = bool(int(data['practice']))
-        end = bool(int(data['end']))
         group_id = data['group_id']
+        end = bool(int(data['end']))
 
         result_recording_id = eng.execute('''select recording_id from "Recording" where file_name = ''' + "'" + file_name + "'")
         for r in result_recording_id:
@@ -136,6 +132,7 @@ def next():
         result = eng.execute('''select id from "Annotation" where survey_id = ''' + "'" + survey_id + "' order by id desc limit 1")
         for r in result:
             annotation_id = str(dict(r)['id'])
+
         eng.execute('''update "Interaction" set annotation_id = ''' + "'" + annotation_id + "'" + ''' where annotation_id = '''  + "'" + survey_id + "'")
         eng.execute('''update "Location" set annotation_id = ''' + "'" +annotation_id + "'" +''' where annotation_id = '''  + "'" + survey_id + "'")
 
@@ -144,7 +141,6 @@ def next():
             eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id = ''' + str(group_id))
 
     return 'success'
-
 
 if __name__ =='__main__':
     app.run(debug=True)

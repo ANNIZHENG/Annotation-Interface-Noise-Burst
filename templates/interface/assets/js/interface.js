@@ -300,7 +300,6 @@ function displayButton(){
 		else{
 			document.getElementById('btn-button-next').value = "GO TO TASK";
 			document.getElementById('btn-button-next').style.display = '';
-			// document.getElementById('btn-button-again').style.display = '';
 		}
 	}
 }
@@ -320,52 +319,41 @@ function ajax_interaction() {
 	request.send(data);
 }
 
-function ajax_next(again, end){
+function ajax_next(end){
 	if (!askProceed()){
 		event.preventDefault();
 		return false;
 	}
-
 	let user_note = document.getElementById("user_note").value;
-	localStorage.setItem("user_note", user_note);
 	timestamp = Date.now();
 	request.open('POST', '/next', true);
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
     let file_name = practice ? recordings_practice[curr_practice_recording] : recordings[curr_recording];
-
 	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note,practice,end,group_id});
 	request.send(data);
 
-	if (again){
-		// curr_practice_recording = 0;
-		// practice = 1;
-		// document.getElementById('source').src = audio_path + 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
-		// document.getElementById('audio').load();
-	}
-	else{
-		if (practice){
-			curr_practice_recording += 1;
-			if (curr_practice_recording > totalPracticeAudios) {
-				document.getElementById('title').style.display = 'none';
-				practice = 0;
-				curr_recording = 0;
-				document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
-				document.getElementById('audio').load();
-			}
-			else{
-				document.getElementById('source').src = audio_path + 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
-				document.getElementById('audio').load();
-			}
-		}
-		else{ // non-practice
-			curr_recording += 1;
-			if (curr_recording > totalAudios) {
-				window.location = '/templates/interface/submit.html';
-				return;
-			}
+	if (practice){
+		curr_practice_recording += 1;
+		if (curr_practice_recording > totalPracticeAudios) { // entering non-practice
+			document.getElementById('title').style.display = 'none';
+			practice = 0;
+			curr_recording = 0;
 			document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
 			document.getElementById('audio').load();
 		}
+		else{
+			document.getElementById('source').src = audio_path + 'group_' + group_id_practice.toString() + '/' + recordings_practice[curr_practice_recording] + '.wav';
+			document.getElementById('audio').load();
+		}
+	}
+	else{ // non-practice
+		curr_recording += 1;
+		if (curr_recording > totalAudios) {
+			window.location = '/templates/interface/submit.html';
+			return;
+		}
+		document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
+		document.getElementById('audio').load();
 	}
 
 	reloadAll();
@@ -374,7 +362,6 @@ function ajax_next(again, end){
 	document.getElementById('side-wrapper').style.display = 'none';
 	document.getElementById('feedback').style.visibility = 'hidden';
 	document.getElementById('btn-button-next').style.display = 'none';
-	// document.getElementById('btn-button-again').style.display = 'none';
 	document.getElementById('audio-frame').style.background = 'linear-gradient(to right, #efefef 0%, #ffffff 0%)';
 }
 
@@ -852,7 +839,7 @@ function dragElement(index,indicator){
 
 			value = curr_azimuth;
 			timestamp = Date.now();
-			action_type = "elevation";
+			action_type = "azimuth";
 			ajax_interaction();
 
 			suppress = true;
