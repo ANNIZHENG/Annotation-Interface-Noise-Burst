@@ -17,7 +17,7 @@ const audio_path = 'https://assets-audio.s3.amazonaws.com/audio/';
 
 document.addEventListener('contextmenu', event => event.preventDefault()); // prevent right click
 
-if (localStorage.getItem('practice') == undefined){
+if (localStorage.getItem('practice') == undefined) {
 	practice = 1; // practice = true
 	curr_practice_recording = 0;
 }

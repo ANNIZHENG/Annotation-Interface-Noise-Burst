@@ -33,7 +33,7 @@ def start():
     practice = bool(int(data['practice']))
 
     while (True):
-        recording = randrange(8) + 1 # get random digit from 1 to 8, which is group id
+        recording = randrange(8) + 1
         recording_practice = 0
         if (practice):
             if (recording == 8):
@@ -69,7 +69,6 @@ def start():
                     index += 1
                 recordings = recordings[:len(recordings)-1] + "}"
                 group_id = '''"group_id":{"0":"''' + str(recording) + '"}'
-
 
                 result = eng.execute('''select file_name from "Recording" where group_id = '''+str(recording_practice))
                 recordings_practice = '''"recordings_practice":{'''

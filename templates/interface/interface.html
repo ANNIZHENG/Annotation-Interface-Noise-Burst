@@ -162,6 +162,9 @@
 		if (localStorage.getItem('stereo') != '1' && localStorage.getItem('headphone') != '1'){
 			window.location = '/templates/interface/incomplete.html';
 		}
+		localStorage.setItem('stereo') = 0;
+		localStorage.setItem('headphone') = 0;
+		
 		document.body.style.cursor='wait';
 		window.onload = function(){
 			document.body.style.cursor='default';
