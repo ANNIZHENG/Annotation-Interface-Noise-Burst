@@ -108,7 +108,7 @@ def next():
         azimuth = data['curr_azimuth']
         elevation = data['curr_elevation']
         practice = bool(int(data['practice']))
-        group_id = data['group_id']
+        group_id = str(data['group_id'])
         end = bool(int(data['end']))
 
         result_recording_id = eng.execute('''select recording_id from "Recording" where file_name = ''' + "'" + file_name + "'")
@@ -142,9 +142,9 @@ def next():
 
         if (end):
             eng.execute('''update "Survey" set completed = true where survey_id = ''' + "'" + survey_id + "'")
-            eng.execute('''update "Survey" set recording_group_id = ''' + "'" + str(group_id) + "' where survey_id = " + "'" + survey_id + "'")
-            eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id = ''' + str(group_id))
-            eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id = ''' + str(group_id))
+            eng.execute('''update "Survey" set recording_group_id = ''' + "'" + group_id + "' where survey_id = " + "'" + survey_id + "'")
+            eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id = ''' + group_id)
+            eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id = ''' + group_id)
 
     return 'success'
 
