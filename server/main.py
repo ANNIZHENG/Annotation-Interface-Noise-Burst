@@ -116,7 +116,12 @@ def next():
             recording_id = dict(r)['recording_id']
 
         timestamp= datetime.fromtimestamp(data['timestamp'] / 1000)
-        entry = Interaction(survey_id,"submit",None,timestamp,practice)
+
+        if (not end):
+            entry = Interaction(survey_id,"submit",None,timestamp,practice)
+        if (end):
+            entry = Interaction(survey_id,"submit all",None,timestamp,practice)
+        
         ses.add(entry)
         ses.commit()
 
@@ -136,6 +141,8 @@ def next():
         eng.execute('''update "Location" set annotation_id = ''' + "'" +annotation_id + "'" +''' where annotation_id = '''  + "'" + survey_id + "'")
 
         if (end):
+            eng.execute('''update "Survey" set completed = true where survey_id = ''' + "'" + survey_id + "'")
+            eng.execute('''update "Survey" set recording_group_id = ''' + "'" + str(group_id) + "' where survey_id = " + "'" + survey_id + "'")
             eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id = ''' + str(group_id))
             eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id = ''' + str(group_id))
 

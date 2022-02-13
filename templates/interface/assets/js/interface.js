@@ -32,12 +32,14 @@ function ajax_start(){
 			survey_id = localStorage.getItem("survey_id");
 
 			group_id = JSON.parse(request_start.response)["group_id"]["0"];
+
 			for (const [key,value] of Object.entries( JSON.parse(request_start.response)["recordings"] )) {
 				recordings.push(value);
 				recordings.push(value);
 				recordings.push(value);
 				recordings.push(value);
 			}
+
 			recordings = shuffle(recordings);
 
 			group_id_practice = JSON.parse(request_start.response)["group_id_practice"]["0"];
@@ -324,11 +326,12 @@ function ajax_next(end){
 		event.preventDefault();
 		return false;
 	}
+
 	let user_note = document.getElementById("user_note").value;
+	let file_name = practice ? recordings_practice[curr_practice_recording] : recordings[curr_recording];
 	timestamp = Date.now();
 	request.open('POST', '/next', true);
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
-    let file_name = practice ? recordings_practice[curr_practice_recording] : recordings[curr_recording];
 	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note,practice,end,group_id});
 	request.send(data);
 
