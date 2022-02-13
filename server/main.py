@@ -1,4 +1,5 @@
 import uuid
+import random
 from sqlalchemy import *
 from sqlalchemy.sql import *
 from datetime import datetime
@@ -33,7 +34,7 @@ def start():
     practice = bool(int(data['practice']))
 
     while (True):
-        recording = randrange(8) + 1
+        recording = random.randint(1,8)
         recording_practice = 0
         if (practice):
             if (recording == 8):
@@ -79,7 +80,6 @@ def start():
                     index += 1
                 recordings_practice = recordings_practice[:len(recordings_practice)-1] + "}"
                 group_id_practice = '''"group_id_practice":{"0":"''' + str(recording_practice) + '"}'
-
                 return "{" + group_id + "," + recordings + "," + group_id_practice + "," + recordings_practice + "}"
 
 @app.route('/interaction', methods=['GET', 'POST'])
@@ -110,12 +110,18 @@ def next():
         practice = bool(int(data['practice']))
         group_id = str(data['group_id'])
         end = bool(int(data['end']))
+        timestamp= datetime.fromtimestamp(data['timestamp'] / 1000)
+
+        if (end):
+            eng.execute('''update "Survey" set completed = true where survey_id = ''' + "'" + survey_id + "'")
+            eng.execute('''update "Survey" set recording_group_id = ''' + "'" + group_id + "' where survey_id = " + "'" + survey_id + "'")
+            eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id = ''' + group_id)
+            eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id = ''' + group_id)
 
         result_recording_id = eng.execute('''select recording_id from "Recording" where file_name = ''' + "'" + file_name + "'")
+       
         for r in result_recording_id:
             recording_id = dict(r)['recording_id']
-
-        timestamp= datetime.fromtimestamp(data['timestamp'] / 1000)
 
         if (not end):
             entry = Interaction(survey_id,"submit",None,timestamp,practice)
@@ -140,13 +146,7 @@ def next():
         eng.execute('''update "Interaction" set annotation_id = ''' + "'" + annotation_id + "'" + ''' where annotation_id = '''  + "'" + survey_id + "'")
         eng.execute('''update "Location" set annotation_id = ''' + "'" +annotation_id + "'" +''' where annotation_id = '''  + "'" + survey_id + "'")
 
-        if (end):
-            eng.execute('''update "Survey" set completed = true where survey_id = ''' + "'" + survey_id + "'")
-            eng.execute('''update "Survey" set recording_group_id = ''' + "'" + group_id + "' where survey_id = " + "'" + survey_id + "'")
-            eng.execute('''update "Recording" set group_num_annotation = group_num_annotation + 1 where group_id = ''' + group_id)
-            eng.execute('''update "Recording" set user_num_annotation = user_num_annotation + 4 where group_id = ''' + group_id)
-
-    return 'success'
+        return 'success'
 
 if __name__ =='__main__':
     app.run(debug=True)

@@ -1,5 +1,3 @@
-// request to server
-var request = new XMLHttpRequest();
 var survey_id = '';
 
 var recordings = [];
@@ -315,6 +313,7 @@ function askProceed(){
 }
 
 function ajax_interaction() {
+	var request = new XMLHttpRequest();
 	request.open('POST', '/interaction', true);
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
 	var data = JSON.stringify({action_type,value,timestamp,survey_id,practice});
@@ -322,6 +321,8 @@ function ajax_interaction() {
 }
 
 function ajax_next(end){
+	var request = new XMLHttpRequest();
+	
 	if (!askProceed()){
 		event.preventDefault();
 		return false;
@@ -334,6 +335,12 @@ function ajax_next(end){
 	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
 	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note,practice,end,group_id});
 	request.send(data);
+
+	request.onreadystatechange = function() {
+		if (request.readyState == 4){
+			if (request.responseText != 'success') window.alert("Something is wrong");
+		}
+	}
 
 	if (practice){
 		curr_practice_recording += 1;
