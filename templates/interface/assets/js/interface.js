@@ -321,7 +321,7 @@ function ajax_interaction() {
 }
 
 function ajax_next(end){
-	var request = new XMLHttpRequest();
+	var request_next = new XMLHttpRequest();
 	
 	if (!askProceed()){
 		event.preventDefault();
@@ -331,14 +331,14 @@ function ajax_next(end){
 	let user_note = document.getElementById("user_note").value;
 	let file_name = practice ? recordings_practice[curr_practice_recording] : recordings[curr_recording];
 	timestamp = Date.now();
-	request.open('POST', '/next', true);
-	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+	request_next.open('POST', '/next', true);
+	request_next.setRequestHeader('content-type', 'application/json;charset=UTF-8');
 	var data = JSON.stringify({survey_id,file_name,curr_azimuth,curr_elevation,timestamp,user_note,practice,end,group_id});
-	request.send(data);
+	request_next.send(data);
 
-	request.onreadystatechange = function() {
-		if (request.readyState == 4){
-			if (request.responseText != 'success') window.alert("Something is wrong");
+	request_next.onreadystatechange = function() {
+		if (request_next.readyState == 4){
+			if (request_next.responseText != 'success') window.alert("Something is wrong");
 		}
 	}
 
@@ -360,7 +360,6 @@ function ajax_next(end){
 		curr_recording += 1;
 		if (end) {
 			window.location = '/templates/interface/submit.html';
-			// return;
 		}
 		document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
 		document.getElementById('audio').load();
