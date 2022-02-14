@@ -124,7 +124,7 @@ def next():
             recording_id = dict(r)['recording_id']
 
         if (not end):
-            entry = Interaction(survey_id,"submit",None,timestamp,practice)
+            entry = Interaction(survey_id,"submit annotation",None,timestamp,practice)
         if (end):
             entry = Interaction(survey_id,"submit all",None,timestamp,practice)
         

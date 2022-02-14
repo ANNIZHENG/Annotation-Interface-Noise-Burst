@@ -358,9 +358,9 @@ function ajax_next(end){
 	}
 	else{ // non-practice
 		curr_recording += 1;
-		if (curr_recording > totalAudios) {
+		if (end) {
 			window.location = '/templates/interface/submit.html';
-			return;
+			// return;
 		}
 		document.getElementById('source').src = audio_path + 'group_' + group_id.toString() + '/' + recordings[curr_recording] + '.wav';
 		document.getElementById('audio').load();
