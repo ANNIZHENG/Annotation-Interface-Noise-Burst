@@ -84,6 +84,27 @@ function setUp(){
     }
 }
 
+function ajax_interaction_pass(pass){
+    let action_type = 'stereo screening: ';
+    if (pass){
+        action_type += 'pass';
+    }
+    else{
+        action_type += 'fail';
+    }
+
+    let survey_id = localStorage.getItem("survey_id");
+    let value = null;
+    let timestamp = Date.now();
+    let practice = 0;
+
+    var request = new XMLHttpRequest();
+    request.open('POST', '/interaction', true);
+    request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+    var data = JSON.stringify({survey_id,action_type,value,timestamp,practice});
+    request.send(data);
+}
+
 document.getElementById("submit").onclick = function(e){
     for (let i = 0; i < 6; i++){
         if (!document.getElementById('radio-'+i+"-left").checked && !document.getElementById('radio-'+i+"-right").checked){
@@ -92,6 +113,7 @@ document.getElementById("submit").onclick = function(e){
             let error_text = document.createElement('div');
             error_text.innerHTML = "Screening task failed. Your headphones do not meet the qualifications for the task.";
             document.getElementById("body").appendChild(error_text);
+            ajax_interaction_pass(false);
             return;
         }
         if (document.getElementById('radio-'+i+"-left").checked){
@@ -101,6 +123,7 @@ document.getElementById("submit").onclick = function(e){
                 let error_text = document.createElement('div');
                 error_text.innerHTML = "Screening task failed. Your headphones do not meet the qualifications for the task.";
                 document.getElementById("body").appendChild(error_text);
+                ajax_interaction_pass(false);
                 return;
             }
         }
@@ -111,10 +134,12 @@ document.getElementById("submit").onclick = function(e){
                 let error_text = document.createElement('div');
                 error_text.innerHTML = "Screening task failed. Your headphones do not meet the qualifications for the task.";
                 document.getElementById("body").appendChild(error_text);
+                ajax_interaction_pass(false);
                 return;
             }
         }
     }
+    ajax_interaction_pass(true);
     localStorage.setItem('stereo',1);
     window.location = '/templates/interface/interface.html';
 };

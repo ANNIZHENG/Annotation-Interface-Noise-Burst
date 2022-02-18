@@ -41,8 +41,12 @@ Contact Ray Gonzalez raygon@mit.edu or Kevin J. P. Woods kwoods@mit.edu
         var results = data.data;
         var config = data.config;
         var didPass = data.didPass;
-        if (didPass) start();
+        if (didPass) {
+          ajax_interaction_pass(true);
+          start();
+        }
         else {
+          ajax_interaction_pass(false);
           $('<div/>', {
             html: 'Screening task failed. Your headphones do not meet the qualifications for the task.'
           }).appendTo($('body'));
@@ -51,6 +55,26 @@ Contact Ray Gonzalez raygon@mit.edu or Kevin J. P. Woods kwoods@mit.edu
       function start(){
         localStorage.setItem('headphone',1);
         window.location = '/templates/stereo_check.html';
+      }
+      function ajax_interaction_pass(pass){
+        let action_type = 'headphone screening: ';
+        if (pass){
+          action_type += 'pass';
+        }
+        else{
+          action_type += 'fail';
+        }
+
+        let survey_id = localStorage.getItem("survey_id");
+        let value = null;
+        let timestamp = Date.now();
+        let practice = 0;
+
+        var request = new XMLHttpRequest();
+        request.open('POST', '/interaction', true);
+        request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+        var data = JSON.stringify({survey_id,action_type,value,timestamp,practice});
+        request.send(data);
       }
     </script>
   </body>
