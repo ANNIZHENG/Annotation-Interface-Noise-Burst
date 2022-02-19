@@ -58,7 +58,7 @@ def start():
 
         for r in result:
             group_num_annotation = int(dict(r)['group_num_annotation'])
-            if (group_num_annotation == 8):
+            if (group_num_annotation >= 8):
                 break
             else:
                 result = eng.execute('''select file_name from "Recording" where group_id = '''+str(recording))
