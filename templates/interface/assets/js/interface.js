@@ -19,6 +19,11 @@ if (localStorage.getItem('practice') == undefined) {
 	practice = 1; // practice = true
 	curr_practice_recording = 0;
 }
+else {
+	practice = localStorage.getItem('practice');
+}
+
+survey_id = localStorage.getItem("survey_id");
 
 ajax_start();
 function ajax_start(){
@@ -26,8 +31,6 @@ function ajax_start(){
 	request_start.open('POST', '/annotation_interface');
 	request_start.onreadystatechange = function() {
 		if (request_start.readyState == 4){
-
-			survey_id = localStorage.getItem("survey_id");
 
 			group_id = JSON.parse(request_start.response)["group_id"]["0"];
 
@@ -71,6 +74,16 @@ function shuffle(array) {
 
 // check if the user goes through the whole instruction
 var read_all_rules = false;
+if (parseInt(localStorage.getItem('read_all_rules'))){
+	read_all_rules = true;
+	document.getElementById('sign').style.visibility = '';
+}
+else{
+	action_type = "enter instruction page 0";
+	value = null;
+	timestamp = Date.now();
+	ajax_interaction();
+}
 
 // color of the displayed annotation dot
 const color = 0x009dff;
@@ -145,19 +158,22 @@ function popRules(e){
 
 function closeRules(e){ 
 	e.preventDefault();
-
 	if (!read_all_rules && document.getElementById('instruction-video-4').currentTime != document.getElementById('instruction-video-4').duration) {
 		window.alert("Please finish watching the current video first");
 		return;
 	}
-
+	if (practice){
+		action_type = "close instruction page";
+		value = null;
+		timestamp = Date.now();
+		ajax_interaction();
+	}
 	read_all_rules = true;
-
+	localStorage.setItem('read_all_rules', 1);
 	let videos = document.getElementsByTagName('video');
 	for(let i = 0; i<videos.length; i++){
 		videos[i].pause();
 	}
-
 	modal.style.display = "none";
 }
 
@@ -165,6 +181,12 @@ function move_instruction_next(e){
 	e.preventDefault();
 
 	if (curr_instruction == 1) {
+		if (!read_all_rules){
+			action_type = "enter instruction page 1";
+			value = null;
+			timestamp = Date.now();
+			ajax_interaction();
+		}
 		document.getElementById('instruction-video-1').currentTime = 0;
 		document.getElementById('instruction-video-1').play();
 	}
@@ -173,6 +195,12 @@ function move_instruction_next(e){
 		if ( !read_all_rules && (document.getElementById('instruction-video-1').currentTime != document.getElementById('instruction-video-1').duration) ) {
 			window.alert("Please finish watching the current video first");
 			return;
+		}
+		if (!read_all_rules){
+			action_type = "enter instruction page 2";
+			value = null;
+			timestamp = Date.now();
+			ajax_interaction();
 		}
 		document.getElementById('instruction-video-1').pause();
 		document.getElementById('instruction-video-2').currentTime = 0;
@@ -184,6 +212,12 @@ function move_instruction_next(e){
 			window.alert("Please finish watching the current video first");
 			return;
 		}
+		if (!read_all_rules){
+			action_type = "enter instruction page 3";
+			value = null;
+			timestamp = Date.now();
+			ajax_interaction();
+		}
 		document.getElementById('instruction-video-2').pause();
 		document.getElementById('instruction-video-3').currentTime = 0;
 		document.getElementById('instruction-video-3').play();
@@ -193,6 +227,12 @@ function move_instruction_next(e){
 		if ( !read_all_rules && (document.getElementById('instruction-video-3').currentTime != document.getElementById('instruction-video-3').duration) ) {
 			window.alert("Please finish watching the current video first");
 			return;
+		}
+		if (!read_all_rules){
+			action_type = "enter instruction page 4";
+			value = null;
+			timestamp = Date.now();
+			ajax_interaction();
 		}
 		document.getElementById('instruction-video-3').pause();
 		document.getElementById('instruction-video-4').currentTime = 0;
@@ -217,22 +257,46 @@ function move_instruction_last(e){
 	if (curr_instruction > 1) {
 
 		if (curr_instruction == 2) {
+			if (!read_all_rules){
+				action_type = "enter instruction page 0";
+				value = null;
+				timestamp = Date.now();
+				ajax_interaction();
+			}
 			document.getElementById('instruction-video-1').pause();
 		}
 
 		if (curr_instruction == 3){
+			if (!read_all_rules){
+				action_type = "enter instruction page 1";
+				value = null;
+				timestamp = Date.now();
+				ajax_interaction();
+			}
 			document.getElementById('instruction-video-2').pause();
 			document.getElementById('instruction-video-1').currentTime = 0;
 			document.getElementById('instruction-video-1').play();
 		}
 
 		if (curr_instruction == 4) {
+			if (!read_all_rules){
+				action_type = "enter instruction page 2";
+				value = null;
+				timestamp = Date.now();
+				ajax_interaction();
+			}
 			document.getElementById('instruction-video-3').pause();
 			document.getElementById('instruction-video-2').currentTime = 0;
 			document.getElementById('instruction-video-2').play();
 		}
 
 		if (curr_instruction == 5) {
+			if (!read_all_rules){
+				action_type = "enter instruction page 3";
+				value = null;
+				timestamp = Date.now();
+				ajax_interaction();
+			}
 			document.getElementById('instruction-video-4').pause();
 			document.getElementById('instruction-video-3').currentTime = 0;
 			document.getElementById('instruction-video-3').play();
@@ -313,11 +377,19 @@ function askProceed(){
 }
 
 function ajax_interaction() {
-	var request = new XMLHttpRequest();
-	request.open('POST', '/interaction', true);
-	request.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+	var request_interaction = new XMLHttpRequest();
+	request_interaction.open('POST', '/interaction', true);
+	request_interaction.setRequestHeader('content-type', 'application/json;charset=UTF-8');
 	var data = JSON.stringify({action_type,value,timestamp,survey_id,practice});
-	request.send(data);
+	request_interaction.onreadystatechange = function() {
+		if (request_interaction.readyState == 4){
+			if (request_interaction.responseText != 'success') {
+				window.alert("Something is wrong");
+				return;
+			}
+		}
+	}
+	request_interaction.send(data);
 }
 
 function ajax_next(end){
@@ -338,7 +410,10 @@ function ajax_next(end){
 
 	request_next.onreadystatechange = function() {
 		if (request_next.readyState == 4){
-			if (request_next.responseText != 'success') window.alert("Something is wrong");
+			if (request_next.responseText != 'success') {
+				window.alert("Something is wrong");
+				return;
+			}
 		}
 	}
 

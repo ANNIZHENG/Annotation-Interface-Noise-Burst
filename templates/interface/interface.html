@@ -158,12 +158,14 @@
 	<script src="//cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
 	<script src="/templates/interface/assets/js/interface.js"></script>
 	<script type="text/javascript">
-		if (localStorage.getItem('stereo') != '1' && localStorage.getItem('headphone') != '1'){
+		if ( localStorage.getItem('stereo') != '1' 
+		|| localStorage.getItem('headphone') != '1' 
+		|| localStorage.getItem('survey_id') == undefined ){
 			window.location = '/templates/interface/incomplete.html';
 		}
 
-		localStorage.setItem('stereo', 0)
-		localStorage.setItem('headphone', 0)
+		localStorage.setItem('stereo', 0);
+		localStorage.setItem('headphone', 0);
 		
 		document.body.style.cursor='wait';
 		window.onload = function(){
